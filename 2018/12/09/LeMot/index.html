@@ -147,44 +147,44 @@
 <main class="app-body flex-box">
   <!-- Article START -->
   <article class="post-article">
-    <section class="markdown-content"><p><em>Trop souvent, les gens parlent de «mots» pour désigner des «tokens» en NLP.
-Ca fait marrer les linguistes.
-Je vais présenter ici juste deux ou trois bricoles qu’on apprend en début de cursus linguistique afin d’expliquer pourquoi.</em></p>
+    <section class="markdown-content"><p><em>Trop souvent en NLP, les gens parlent de &quot; mots &quot; pour désigner des &quot; tokens &quot;.
+Ça fait marrer les linguistes.
+Je vais présenter ici deux ou trois bricoles qu’on apprend en début de cursus linguistique afin d’expliquer pourquoi.</em></p>
 <a id="more"></a>
 <hr>
 <p>Beaucoup de concepts fondamentaux discutés en linguistique sont liés aux unités de base
-autour desquelles se structurent les langues: morphème, mot,… Sauf qu’il n’y a pas de consensus concernant ces sujets.
+autour desquelles se structurent les langues : morphème, mot… Sauf qu’il n’y a pas de consensus concernant ces sujets.
 C’est du mot dont il sera rapidement question dans ce billet.</p>
 <h1>Un mot, c’est quoi ?</h1>
-<p>Le locuteur du français a une compréhension intuitive de ce qu’il considère être un mot, intuition fondée sur la typographie.
-Le français, comme la plupart des écritures alphabétiques, dispose de caractères de segmentation «évidents»
+<p>Le locuteur français a une compréhension intuitive de ce qu’il considère être un mot, intuition fondée sur la typographie.
+Le français, comme la plupart des écritures alphabétiques, dispose de caractères de segmentation &quot; évidents &quot;
 (espaces et ponctuation) pour permettre au lecteur d’identifier confortablement les éléments du lexique.</p>
-<p>Les étudiants linguistes apprennent rapidement que le «mot», qui semble intuitivement être une notion triviale,
+<p>Les étudiants linguistes apprennent rapidement que le &quot; mot &quot;, qui semble intuitivement être une notion triviale,
 est, dans les faits, difficile à définir.</p>
 <blockquote>
 <p>J’ai regardé germer cette patate douce.</p>
 </blockquote>
-<p>Cette phrase comporte 7 mots typographiques (que l’on appellera aussi «tokens»), séparés par des espaces ou des marques
+<p>Cette phrase comporte (a priori) 7 mots typographiques (que l’on appellera aussi «tokens»), séparés par des espaces ou des marques
 de ponctuation. Même dans cet exemple simple, deux éléments posent question dans leur nature de mot:</p>
 <ul>
 <li>
-<p><code>patate douce</code> : 1 ou 2 mots ? Est-elle vraiment si douce ?</p>
+<p><code>patate douce</code> : Un ou deux mots ? Est-elle vraiment si douce ?</p>
 </li>
 <li>
-<p><code>J'ai</code> 1 ou 2 mot(s) ? On y reviendra…</p>
+<p><code>J'ai</code>: Un ou deux mots ? On y reviendra.</p>
 </li>
 </ul>
 <p>Il existe un certain nombre de critères (ou tests) linguistiques pour déterminer où se trouvent les frontières de mots dans
-des modèles ou pour des applications données. Nous allons juste donner un apperçu rapide de quelques définitions possibles
+des modèles ou pour des applications données. Nous allons donner un apperçu rapide de quelques définitions possibles
 selon les différents niveaux d’analyse linguistique.
-Nous reprenons ici en grande partie la typologie décrite dans Packard (2000) <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>, même si ces débats sont bien plus vieux.</p>
+Nous reprenons ici en grande partie la typologie décrite dans Packard (2000)<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>, même si ces débats sont bien plus vieux.</p>
 <h2>Mots syntaxiques</h2>
 <p>Au niveau <strong>syntaxique</strong>, les mots sont des entités qui peuvent apparaître <em>librement</em> dans le discours et être remplacées
 par des entités similaires au même emplacement sur l’axe syntagmatique.</p>
 <img src="/2018/12/09/LeMot/syntagmatic_paradigmatic.png" title="[title]">
 <p>Ces entités, lorsqu’elles se situent sur un même axe paradigmatique, possèdent la même partie du discours.
 «<em>Pomme de terre</em>» peut être remplacé par «<em>chien</em>», avec la même partie du discours (ici, un nom).</p>
-<p>Quand on dit «apparaître <em>librement</em> dans le discours», c’est parce que bien sûr il y a des cas limites pour lesquels ça
+<p>Quand on dit «apparaître <em>librement</em> dans le discours», c’est parce que, bien sûr, il y a des cas limites pour lesquels ça
 n’est pas si clair. Dans notre première phrase d’exemple,  «<em>J’</em>» (ou «<em>je</em>») ne peut pas
 apparaître indépendamment du verbe, avec lequel il forme un seul <strong>mot prosodique</strong><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>.
 Ce type d’unité, dont les propriétés semblent à première vue intermédiaires entre celles des mots et celles des
@@ -197,29 +197,29 @@ Une analyse morphologique sur ces mots, selon leur complexité, permet d’ident
 ou même des <a href="https://fr.wikipedia.org/wiki/Lemme_(linguistique)" target="_blank" rel="noopener">lemmes</a>, ainsi que des
 <a href="https://fr.wikipedia.org/wiki/Langue_flexionnelle" target="_blank" rel="noopener">catégories flexionnelles</a>.
 Ces traitements sont surtout utiles sur des langues à morphologie particulièrement riches, notamment pour aider à conjurer
-&quot;the curse of dimensionality&quot;.</p>
+&quot;<em>the curse of dimensionality</em>&quot;.</p>
 <h2>Mots lexicaux</h2>
 <p>Les <strong>mots lexicaux</strong> correspondent aux associations « idiosyncratiques et arbitraires de sons et de sens » ne pouvant
 pas être déduites de règles de formations (Packard, 2000, p.9).
 Autrement dit, vous ne savez pas pourquoi on désigne des chats par le mot «chat», prononcé \ʃa\ . C’est idiosyncratique
 et arbitraire (en synchronie tout du moins).
 Les mots lexicaux sont donc des unités susceptibles d’apparaître dans des listes lexicales, à l’instar d’entrées de
-dictionnaires. Les trouver de façon automatique est une tâche complexe dans les langues flexionnelles car il s’agit
+dictionnaires. Les trouver de façon automatique est une tâche complexe dans les langues flexionnelles: il s’agit
 d’identifier des unités de type lemme, mais aussi dans toutes les langues de manière plus générale pour la
 détection de locutions, de termes, voire d’entités nommées.</p>
 <h2>Mots sémantiques</h2>
-<p>Les <strong>mots sémantiques</strong> font quand à eux référence à des concepts unitaires, qui en appellent plus aux propriétés
+<p>Les <strong>mots sémantiques</strong> font quant à eux référence à des concepts unitaires, qui en appellent plus aux propriétés
 ontologiques qu’aux propriétés fonctionnelles d’un mot.
 On peut considérer qu’il existe une équivalence grossière entre le mot sémantique et le mot lexical.
-Dans les langues analytiques, plusieurs <strong>mots morphologiques</strong> (<code>vais</code>, <code>ailles</code>, <code>irions</code>,…) peuvent être des
+Dans les langues analytiques, plusieurs <strong>mots morphologiques</strong> (<code>vais</code>, <code>ailles</code>, <code>irions</code>…) peuvent être des
 variantes d’un même <strong>mot sémantique</strong> (<code>aller</code>).</p>
-<h1>On fait comment en NLP du coup ?</h1>
+<h1>On fait comment en NLP, du coup ?</h1>
 <p>Comme on l’a vu, on peut adapter les définitions de la notion de mot en fonction des contextes linguistiques et des
 applications.
 Pour les applicatons NLP les plus courrantes, on se contente d’utiliser des <strong>tokens</strong> (issus de phases de tokénisation
 ou de segmentation) en input de la suite des traitements.<br>
 Or, les systèmes d’écritures utilisés par les langues ont un impact considérable sur ces tâches.
-La suite de ce billet va développer un peu l’idée autour des 3 exemples suivants:</p>
+La suite de ce billet va développer un peu l’idée autour des trois exemples suivants:</p>
 <blockquote>
 <p>Français: <code>J'ai regardé germer cette patate douce.</code></p>
 </blockquote>
@@ -231,36 +231,35 @@ La suite de ce billet va développer un peu l’idée autour des 3 exemples suiv
 </blockquote>
 <h2>Tokénisation</h2>
 <p>On va parler de tokénisation spécifiquement quand on peut segmenter sur des caractères bien identifiés.
-Ca sera donc pour des les langues ayant des séparateurs typographiques pertinents, comme les espaces par exemple.</p>
+Ce sera donc pour des langues ayant des séparateurs typographiques pertinents, comme les espaces.</p>
 <blockquote>
 <p>J’ai regardé germer cette patate douce.</p>
 </blockquote>
 <p>La tokénisation consiste alors à normaliser les découpages suivant des règles strictes.
-Ces dernières peuvent être:</p>
+Ces dernières peuvent être :</p>
 <ul>
 <li>
-<p>uniquement typographiques: « séparer du reste par une espace tous les caractères non-alphabétiques »,…</p>
+<p>uniquement typographiques : « séparer du reste par une espace tous les caractères non-alphabétiques »…</p>
 <p>$\rightarrow$ <code>J'•ai•regardé•germer•cette•patate•douce•.</code></p>
 </li>
 <li>
-<p>linguistiquement motivées: « accoler un clitique et son hôte dans un même token », «couper les mots composés par
-composition concaténative (langues germaniques occidentales, scandinaves, grec moderne…)», «regrouper les
+<p>linguistiquement motivées : « accoler un clitique et son hôte dans un même token », &quot; couper les mots composés par
+composition concaténative (langues germaniques occidentales, scandinaves, etc.) «, &quot; regrouper les
 expressions multi-mots»,…</p>
 <p>$\rightarrow$ <code>J'ai•regardé•germer•cette•patate douce•.</code></p>
 </li>
 </ul>
-<p>La phase de tokénisation comporte d’autres détails techniques:</p>
+<p>La phase de tokénisation comporte d’autres détails techniques :</p>
 <ul>
-<li>certains éléments peuvent paraître ambigus (nombres contenant de la ponctuation, URL,…),</li>
+<li>certains éléments peuvent paraître ambigus (nombres contenant de la ponctuation, URL, etc.),</li>
 <li>les chaînes de caractère doivent être normalisées de la même manière pour pouvoir ensuite être comparées<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup>.</li>
 </ul>
 <h2>Segmentation</h2>
-<p>On parle de «segmentation» pour des langues sans séparateur typographique pertinent. Considérez ces deux exemples:</p>
+<p>On parle de &quot; segmentation &quot; pour des langues sans séparateur typographique pertinent. Considérez ces deux exemples:</p>
 <h3>Systèmes d’écriture <em>scriptio continua</em></h3>
-<p>À l’instar du thai, du lao et de bien d’autres langues, le chinois ne fait pas
-usage d’un caractère spécifique pour marquer les frontières de “mots”.
-Voici un exemple en chinois, (littéralement: « En particulier, les gens qui travaillent depuis environ 3 ou
-4 ans n’ont pas d’opportunité.»)</p>
+<p>À l’instar du thai, du lao et de bien d’autres langues, le chinois ne fait pas usage d’un caractère spécifique pour
+marquer les frontières de “mots”. Voici un exemple en chinois, (littéralement: « En particulier, les gens qui
+travaillent depuis environ 3 ou 4 ans n’ont pas d’opportunité.»)</p>
 <blockquote>
 <p>特别是工作了近三四年的人也无机会。</p>
 </blockquote>
@@ -303,7 +302,7 @@ Voici un exemple en chinois, (littéralement: « En particulier, les gens qui tr
 </tbody>
 </table>
 <h3>Systèmes «sur-segmentés»</h3>
-<p>C’est le cas par exemple du Vietnamien, qui est une <a href="https://fr.wikipedia.org/wiki/Langue_isolante" target="_blank" rel="noopener">langue isolante</a>
+<p>C’est le cas par exemple du vietnamien, qui est une <a href="https://fr.wikipedia.org/wiki/Langue_isolante" target="_blank" rel="noopener">langue isolante</a>
 utilisant l’espace comme séparateur sans pour autant marquer des frontières entre les “mots”:</p>
 <blockquote>
 <p>Khi tôi đến nhà bạn tôi, chúng tôi bắt đầu làm bài.</p>
@@ -347,21 +346,21 @@ De la même façon, les tokens <code>chúng</code> et <code>tôi</code> fonction
 </tbody>
 </table>
 <hr>
-<p>Il devient donc indispensable de regarder pour chaque langue quelles sont les solutions de segmentation état de l’art.
-Car si il est impossible d’avoir une notion de “mot” valable à travers les langues, la notion de “token” est elle aussi
-ambiguë. Donc même pour la tokénisation, il ne faut pas partir du principe qu’un algorithme qui fonctionne
-bien sur une langue (l’anglais par exemple) sera pertinant pour une autre.</p>
+<p>Il devient donc indispensable de regarder pour chaque langue quelles sont les solutions de segmentation état-de-l’art.
+Car s’il est impossible d’avoir une notion de “mot” valable à travers les langues, la notion de “token” est elle aussi
+ambiguë. Donc, même pour la tokénisation, il ne faut pas partir du principe qu’un algorithme qui fonctionne
+bien sur une langue (l’anglais par exemple) sera pertinent pour une autre.</p>
 <h1>Conclusion</h1>
 <p>On a vu que définir ce qu’est un mot est une tâche plus délicate qu’il n’y paraît.
-Cette intuition, influencée par l’environnement linguistique du locuteur et les finalités de l’analyse linguistique,
+Cette intuition, influencée par l’environnement linguistique du locuteur et les finalités de l’analyse,
 peut également varier d’une personne à l’autre, et ce même si des connaissances linguistique sur les questions relatives
 au mot entrent en jeu<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup>.
 Cette notion est encore plus ambiguë si on l’envisage depuis des langues très différentes : un Inuit et un Chinois auront
-probablement de grandes difficultés à comprendre intuitivement quel est le mot de l’autre.</p>
-<p>Gonc en bref:</p>
+probablement de grandes difficultés à comprendre intuitivement quel est le “mot” de l’autre.</p>
+<p>En bref :</p>
 <ul>
-<li>si vous voulez parler de token, parlez de «token» et pas de «mot».</li>
-<li>et dites comment vous obtenez vos tokens, sinon on ne sait toujours pas vraiment de quoi vous parlez.</li>
+<li>si vous voulez parler de token, parlez de &quot; token &quot; et pas de &quot; mot &quot;.</li>
+<li>et dites comment vous obtenez vos tokens. Sinon, on ne sait toujours pas de quoi vous parlez.</li>
 </ul>
 <h1>Bibliographie</h1>
 <p>Ce billet reprend largement des éléments du chapitre 5 de <a href="https://hal.archives-ouvertes.fr/tel-01257201/document" target="_blank" rel="noopener">ma thèse</a>.</p>
@@ -431,7 +430,7 @@ probablement de grandes difficultés à comprendre intuitivement quel est le mot
   <div class="toc-main">
     <strong class="toc-title">Catalog</strong>
     
-      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Un mot, c’est quoi ?</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots syntaxiques</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots morphologiques</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots lexicaux</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots sémantiques</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">On fait comment en NLP du coup ?</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Tokénisation</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Segmentation</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Systèmes d’écriture scriptio continua</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Systèmes «sur-segmentés»</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Conclusion</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Bibliographie</span></a></li></ol>
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Un mot, c’est quoi ?</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots syntaxiques</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots morphologiques</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots lexicaux</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots sémantiques</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">On fait comment en NLP, du coup ?</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Tokénisation</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Segmentation</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Systèmes d’écriture scriptio continua</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Systèmes «sur-segmentés»</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Conclusion</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Bibliographie</span></a></li></ol>
     
   </div>
 </aside>
