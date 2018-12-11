@@ -10,7 +10,7 @@
   
   <title>
     
-      Tags | Mes Grosses Boites à Moustaches
+      Mes Grosses Boites à Moustaches
     
   </title>
   <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -138,68 +138,45 @@
 </header>
 
     <div id="article-banner">
-  <h2>Tags</h2>
-  <!--p class="post-date">Étiquettes</p-->
+  <h2>Archives</h2>
+  <p class="post-date"></p>
 </div>
-<main class="app-body">
-  <div id="tag-cloud">
+<main class="app-body" id="archives">
+  
+  
+  
+    <section class="time-section">
+  <h1 class="section-year">
+    2018
+  </h1>
+  <div class="section-list">
     
-      <a class="tag2" data-name="tag-NLP">NLP</a>
     
-      <a class="tag3" data-name="tag-Sklearn">Sklearn</a>
+      <div class="section-list-item">
+        <a href="/2018/12/09/PlayingWithMammo/" class="archive-title">Playing With Mammographic Masses !</a>
+        <p class="archive-date">09-12</p>
+      </div>
     
-      <a class="tag0" data-name="tag-ML">ML</a>
+      <div class="section-list-item">
+        <a href="/2018/12/09/LeMot/" class="archive-title">Non, Un Token N&#39;est Pas Un mot...</a>
+        <p class="archive-date">09-12</p>
+      </div>
+    
+      <div class="section-list-item">
+        <a href="/2018/12/05/typematrix/" class="archive-title">Passer Au Bépo TypeMatrix Sous Linux (Ubuntu)</a>
+        <p class="archive-date">05-12</p>
+      </div>
     
   </div>
+</section>
   
-    <div class="tag-list">
-      <h3 class="tag-name" id="tag-NLP">NLP</h3>
-      
-        <ul class="tag-preview">
-          <li>
-            <a href="/2018/12/09/LeMot/">Non, Un Token N'est Pas Un mot...</a>
-          </li>
-        </ul>
-        
-    </div>
-    
-    <div class="tag-list">
-      <h3 class="tag-name" id="tag-Sklearn">Sklearn</h3>
-      
-        <ul class="tag-preview">
-          <li>
-            <a href="/2018/12/09/PlayingWithMammo/">Playing With Mammographic Masses !</a>
-          </li>
-        </ul>
-        
-    </div>
-    
-    <div class="tag-list">
-      <h3 class="tag-name" id="tag-ML">ML</h3>
-      
-        <ul class="tag-preview">
-          <li>
-            <a href="/2018/12/09/PlayingWithMammo/">Playing With Mammographic Masses !</a>
-          </li>
-        </ul>
-        
-    </div>
-    
 </main>
 
 <script>
   (function () {
-    var url = 'https://valerie-hanoka.github.io/tags/index.html'
-    $('#article-banner').geopattern('Toto', {color: '#a1a1a1'})
-    $('.header').removeClass('fixed-header')
-
-    var tag = location.hash.replace('#', '')
-    if (tag) {
-      var tagId = "#tag-" + tag;
-      $("html, body").animate({
-        scrollTop: $(tagId).offset().top 
-      }, 400)
-    }
+    var url = 'https://valerie-hanoka.github.io/tags/NLP/index.html';
+    $('#article-banner').geopattern('a', {color: '#a1a1a1'});
+    $('.header').removeClass('fixed-header');
   })();
 </script>
     <div class="scroll-top">
