@@ -531,7 +531,7 @@ h2.article-head {
 .markdown-content p code,
 .article-summary p code {
   background-color: #f5f5f5;
-  color: #b9529c;
+  color: #a3100e;
   padding: 3px 5px;
   margin: 0 2px;
   border-radius: 2px;
@@ -628,7 +628,7 @@ h2.article-head {
 }
 .markdown-content > table thead,
 .article-summary > table thead {
-  background-color: #a3100e;
+  background-color: #f5f5f5;
   border-top-width: 1px;
   border-top-style: solid;
   border-top-color: rgba(56,28,45,0.39);
@@ -636,7 +636,7 @@ h2.article-head {
 .markdown-content > table thead th,
 .article-summary > table thead th {
   padding: 5px 10px;
-  color: #fff;
+  color: #a3100e;
 }
 .markdown-content > table tbody tr:nth-child(even),
 .article-summary > table tbody tr:nth-child(even) {
@@ -644,7 +644,7 @@ h2.article-head {
 }
 .markdown-content > table tbody tr:nth-child(odd),
 .article-summary > table tbody tr:nth-child(odd) {
-  background: #fff;
+  background: #fefefe;
 }
 .markdown-content > table tbody tr td,
 .article-summary > table tbody tr td {

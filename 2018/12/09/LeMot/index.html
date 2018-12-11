@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html>
+  <head><meta name="generator" content="Hexo 3.8.0">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+  <meta name="description" content="Hanoka Valérie, NLP Data Scientist">
+  <meta name="keyword" content="NLP, ML">
+  
+    <link rel="shortcut icon" type="image/ico" href="source/css/images/favicon.ico"> 
+  
+  <title>
+    
+      Non, Un Token N&#39;est Pas Un mot... | Mes Grosses Boites à Moustaches
+    
+  </title>
+  <link href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <link href="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.css" rel="stylesheet">
+  <link href="//cdn.bootcss.com/highlight.js/9.12.0/styles/tomorrow.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/plugins/gitment.css">
+  <script src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script src="//cdn.bootcss.com/geopattern/1.2.3/js/geopattern.min.js"></script>
+  <script src="//cdn.bootcss.com/nprogress/0.2.0/nprogress.min.js"></script>
+  <script src="/js/qrious.js"></script>
+<script src="/js/gitment.js"></script>
+  
+  
+    <!-- MathJax support START -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <!-- MathJax support END -->
+  
+
+
+</head>
+<div class="wechat-share">
+  <img src="/css/images/logo.png">
+</div>
+
+  <body>
+    <header class="header fixed-header">
+  <div class="header-container">
+    <a class="home-link" href="/">
+      <div class="logo"></div>
+      <span>Mes Grosses Boites à Moustaches</span>
+    </a>
+    <ul class="right-list">
+      
+        <li class="list-item">
+          
+            <a href="/" class="item-link">Home</a>
+          
+        </li>
+      
+        <li class="list-item">
+          
+            <a href="/tags/" class="item-link">Tags</a>
+          
+        </li>
+      
+        <li class="list-item">
+          
+            <a href="/archives/" class="item-link">Archives</a>
+          
+        </li>
+      
+        <li class="list-item">
+          
+            <a href="/project/" class="item-link">Projects</a>
+          
+        </li>
+      
+        <li class="list-item">
+          
+            <a href="/about/" class="item-link">About</a>
+          
+        </li>
+      
+    </ul>
+    <div class="menu">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </div>
+    <div class="menu-mask">
+      <ul class="menu-list">
+        
+          <li class="menu-item">
+            
+              <a href="/" class="menu-link">Home</a>
+            
+          </li>
+        
+          <li class="menu-item">
+            
+              <a href="/tags/" class="menu-link">Tags</a>
+            
+          </li>
+        
+          <li class="menu-item">
+            
+              <a href="/archives/" class="menu-link">Archives</a>
+            
+          </li>
+        
+          <li class="menu-item">
+            
+              <a href="/project/" class="menu-link">Projects</a>
+            
+          </li>
+        
+          <li class="menu-item">
+            
+              <a href="/about/" class="menu-link">About</a>
+            
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</header>
+
+    <div id="article-banner">
+  <h2>Non, Un Token N'est Pas Un mot...</h2>
+  <p class="post-date">09-12-2018</p>
+  <div class="arrow-down">
+    <a href="javascript:;"></a>
+  </div>
+</div>
+<main class="app-body flex-box">
+  <!-- Article START -->
+  <article class="post-article">
+    <section class="markdown-content"><p><em>Trop souvent, les gens parlent de «mots» pour désigner des «tokens» en NLP.
+Ca fait marrer les linguistes.
+Je vais présenter ici juste deux ou trois bricoles qu’on apprend en début de cursus linguistique afin d’expliquer pourquoi.</em></p>
+<a id="more"></a>
+<hr>
+<p>Beaucoup de concepts fondamentaux discutés en linguistique sont liés aux unités de base
+autour desquelles se structurent les langues: morphème, mot,… Sauf qu’il n’y a pas de consensus concernant ces sujets.
+C’est du mot dont il sera rapidement question dans ce billet.</p>
+<h1>Un mot, c’est quoi ?</h1>
+<p>Le locuteur du français a une compréhension intuitive de ce qu’il considère être un mot, intuition fondée sur la typographie.
+Le français, comme la plupart des écritures alphabétiques, dispose de caractères de segmentation «évidents»
+(espaces et ponctuation) pour permettre au lecteur d’identifier confortablement les éléments du lexique.</p>
+<p>Les étudiants linguistes apprennent rapidement que le «mot», qui semble intuitivement être une notion triviale,
+est, dans les faits, difficile à définir.</p>
+<blockquote>
+<p>J’ai regardé germer cette patate douce.</p>
+</blockquote>
+<p>Cette phrase comporte 7 mots typographiques (que l’on appellera aussi «tokens»), séparés par des espaces ou des marques
+de ponctuation. Même dans cet exemple simple, deux éléments posent question dans leur nature de mot:</p>
+<ul>
+<li>
+<p><code>patate douce</code> : 1 ou 2 mots ? Est-elle vraiment si douce ?</p>
+</li>
+<li>
+<p><code>J'ai</code> 1 ou 2 mot(s) ? On y reviendra…</p>
+</li>
+</ul>
+<p>Il existe un certain nombre de critères (ou tests) linguistiques pour déterminer où se trouvent les frontières de mots dans
+des modèles ou pour des applications données. Nous allons juste donner un apperçu rapide de quelques définitions possibles
+selon les différents niveaux d’analyse linguistique.
+Nous reprenons ici en grande partie la typologie décrite dans Packard (2000) <sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>, même si ces débats sont bien plus vieux.</p>
+<h2>Mots syntaxiques</h2>
+<p>Au niveau <strong>syntaxique</strong>, les mots sont des entités qui peuvent apparaître <em>librement</em> dans le discours et être remplacées
+par des entités similaires au même emplacement sur l’axe syntagmatique.</p>
+<img src="/2018/12/09/LeMot/syntagmatic_paradigmatic.png" title="[title]">
+<p>Ces entités, lorsqu’elles se situent sur un même axe paradigmatique, possèdent la même partie du discours.
+«<em>Pomme de terre</em>» peut être remplacé par «<em>chien</em>», avec la même partie du discours (ici, un nom).</p>
+<p>Quand on dit «apparaître <em>librement</em> dans le discours», c’est parce que bien sûr il y a des cas limites pour lesquels ça
+n’est pas si clair. Dans notre première phrase d’exemple,  «<em>J’</em>» (ou «<em>je</em>») ne peut pas
+apparaître indépendamment du verbe, avec lequel il forme un seul <strong>mot prosodique</strong><sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>.
+Ce type d’unité, dont les propriétés semblent à première vue intermédiaires entre celles des mots et celles des
+affixes, sont appelées <em>clitiques</em>. Elles viennent encore un peu plus foutre le bordel.</p>
+<h2>Mots morphologiques</h2>
+<p>Au niveau <strong>morphologique</strong>, les mots sont « les sorties correctes produites par les règles morphologiques de la langue ».
+J’espère que ça vous aide comme définition.
+Une analyse morphologique sur ces mots, selon leur complexité, permet d’identifier des
+<a href="https://fr.wikipedia.org/wiki/Morphe_(linguistique)" target="_blank" rel="noopener">morphes</a>, des <a href="https://fr.wikipedia.org/wiki/Radical_(linguistique)" target="_blank" rel="noopener">racines</a>
+ou même des <a href="https://fr.wikipedia.org/wiki/Lemme_(linguistique)" target="_blank" rel="noopener">lemmes</a>, ainsi que des
+<a href="https://fr.wikipedia.org/wiki/Langue_flexionnelle" target="_blank" rel="noopener">catégories flexionnelles</a>.
+Ces traitements sont surtout utiles sur des langues à morphologie particulièrement riches, notamment pour aider à conjurer
+&quot;the curse of dimensionality&quot;.</p>
+<h2>Mots lexicaux</h2>
+<p>Les <strong>mots lexicaux</strong> correspondent aux associations « idiosyncratiques et arbitraires de sons et de sens » ne pouvant
+pas être déduites de règles de formations (Packard, 2000, p.9).
+Autrement dit, vous ne savez pas pourquoi on désigne des chats par le mot «chat», prononcé \ʃa\ . C’est idiosyncratique
+et arbitraire (en synchronie tout du moins).
+Les mots lexicaux sont donc des unités susceptibles d’apparaître dans des listes lexicales, à l’instar d’entrées de
+dictionnaires. Les trouver de façon automatique est une tâche complexe dans les langues flexionnelles car il s’agit
+d’identifier des unités de type lemme, mais aussi dans toutes les langues de manière plus générale pour la
+détection de locutions, de termes, voire d’entités nommées.</p>
+<h2>Mots sémantiques</h2>
+<p>Les <strong>mots sémantiques</strong> font quand à eux référence à des concepts unitaires, qui en appellent plus aux propriétés
+ontologiques qu’aux propriétés fonctionnelles d’un mot.
+On peut considérer qu’il existe une équivalence grossière entre le mot sémantique et le mot lexical.
+Dans les langues analytiques, plusieurs <strong>mots morphologiques</strong> (<code>vais</code>, <code>ailles</code>, <code>irions</code>,…) peuvent être des
+variantes d’un même <strong>mot sémantique</strong> (<code>aller</code>).</p>
+<h1>On fait comment en NLP du coup ?</h1>
+<p>Comme on l’a vu, on peut adapter les définitions de la notion de mot en fonction des contextes linguistiques et des
+applications.
+Pour les applicatons NLP les plus courrantes, on se contente d’utiliser des <strong>tokens</strong> (issus de phases de tokénisation
+ou de segmentation) en input de la suite des traitements.<br>
+Or, les systèmes d’écritures utilisés par les langues ont un impact considérable sur ces tâches.
+La suite de ce billet va développer un peu l’idée autour des 3 exemples suivants:</p>
+<blockquote>
+<p>Français: <code>J'ai regardé germer cette patate douce.</code></p>
+</blockquote>
+<blockquote>
+<p>Chinois: <code>特别是工作了近三四年的人也无机会。</code></p>
+</blockquote>
+<blockquote>
+<p>Vietnamien: <code>Khi tôi đến nhà bạn tôi, chúng tôi bắt đầu làm bài.</code></p>
+</blockquote>
+<h2>Tokénisation</h2>
+<p>On va parler de tokénisation spécifiquement quand on peut segmenter sur des caractères bien identifiés.
+Ca sera donc pour des les langues ayant des séparateurs typographiques pertinents, comme les espaces par exemple.</p>
+<blockquote>
+<p>J’ai regardé germer cette patate douce.</p>
+</blockquote>
+<p>La tokénisation consiste alors à normaliser les découpages suivant des règles strictes.
+Ces dernières peuvent être:</p>
+<ul>
+<li>
+<p>uniquement typographiques: « séparer du reste par une espace tous les caractères non-alphabétiques »,…</p>
+<p>$\rightarrow$ <code>J'•ai•regardé•germer•cette•patate•douce•.</code></p>
+</li>
+<li>
+<p>linguistiquement motivées: « accoler un clitique et son hôte dans un même token », «couper les mots composés par
+composition concaténative (langues germaniques occidentales, scandinaves, grec moderne…)», «regrouper les
+expressions multi-mots»,…</p>
+<p>$\rightarrow$ <code>J'ai•regardé•germer•cette•patate douce•.</code></p>
+</li>
+</ul>
+<p>La phase de tokénisation comporte d’autres détails techniques:</p>
+<ul>
+<li>certains éléments peuvent paraître ambigus (nombres contenant de la ponctuation, URL,…),</li>
+<li>les chaînes de caractère doivent être normalisées de la même manière pour pouvoir ensuite être comparées<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup>.</li>
+</ul>
+<h2>Segmentation</h2>
+<p>On parle de «segmentation» pour des langues sans séparateur typographique pertinent. Considérez ces deux exemples:</p>
+<h3>Systèmes d’écriture <em>scriptio continua</em></h3>
+<p>À l’instar du thai, du lao et de bien d’autres langues, le chinois ne fait pas
+usage d’un caractère spécifique pour marquer les frontières de “mots”.
+Voici un exemple en chinois, (littéralement: « En particulier, les gens qui travaillent depuis environ 3 ou
+4 ans n’ont pas d’opportunité.»)</p>
+<blockquote>
+<p>特别是工作了近三四年的人也无机会。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>特别</th>
+<th>是</th>
+<th>工作</th>
+<th>了</th>
+<th>近</th>
+<th>三</th>
+<th>四</th>
+<th>年</th>
+<th>的</th>
+<th>人</th>
+<th>也</th>
+<th>无</th>
+<th>机会</th>
+<th>。</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Particulièrement</td>
+<td>être</td>
+<td>travail</td>
+<td>⟨PST⟩</td>
+<td>approx.</td>
+<td>3</td>
+<td>4</td>
+<td>an</td>
+<td>⟨GEN⟩</td>
+<td>homme</td>
+<td>aussi</td>
+<td>⟨NEG⟩</td>
+<td>opportunité</td>
+<td>.</td>
+</tr>
+</tbody>
+</table>
+<h3>Systèmes «sur-segmentés»</h3>
+<p>C’est le cas par exemple du Vietnamien, qui est une <a href="https://fr.wikipedia.org/wiki/Langue_isolante" target="_blank" rel="noopener">langue isolante</a>
+utilisant l’espace comme séparateur sans pour autant marquer des frontières entre les “mots”:</p>
+<blockquote>
+<p>Khi tôi đến nhà bạn tôi, chúng tôi bắt đầu làm bài.</p>
+</blockquote>
+<p>(littéralement: «Quand je suis arrivé chez mon ami, nous avons commencé la leçon»).
+Les deux tokens <code>bắt</code> et <code>đầu</code>, qui, pris isolément signifient respectivement « attraper » et « tête »
+prennent un sens différent (« commencer ») s’ils sont contigus comme dans cet exemple.
+De la même façon, les tokens <code>chúng</code> et <code>tôi</code> fonctionnent ensemble dans la phrase, et l’on peut souhaiter leur regroupement.</p>
+<table>
+<thead>
+<tr>
+<th>Khi</th>
+<th>tôi</th>
+<th>đến</th>
+<th>nhà</th>
+<th>bạn</th>
+<th>tôi</th>
+<th>,</th>
+<th>chúng  tôi</th>
+<th>bắt đầu</th>
+<th>làm</th>
+<th>bài</th>
+<th>.</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>quand</td>
+<td>moi</td>
+<td>venir</td>
+<td>maison</td>
+<td>ami</td>
+<td>moi</td>
+<td>,</td>
+<td>⟨PL⟩ moi</td>
+<td>commencer</td>
+<td>faire</td>
+<td>leçon</td>
+<td>.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p>Il devient donc indispensable de regarder pour chaque langue quelles sont les solutions de segmentation état de l’art.
+Car si il est impossible d’avoir une notion de “mot” valable à travers les langues, la notion de “token” est elle aussi
+ambiguë. Donc même pour la tokénisation, il ne faut pas partir du principe qu’un algorithme qui fonctionne
+bien sur une langue (l’anglais par exemple) sera pertinant pour une autre.</p>
+<h1>Conclusion</h1>
+<p>On a vu que définir ce qu’est un mot est une tâche plus délicate qu’il n’y paraît.
+Cette intuition, influencée par l’environnement linguistique du locuteur et les finalités de l’analyse linguistique,
+peut également varier d’une personne à l’autre, et ce même si des connaissances linguistique sur les questions relatives
+au mot entrent en jeu<sup class="footnote-ref"><a href="#fn4" id="fnref4">[4]</a></sup>.
+Cette notion est encore plus ambiguë si on l’envisage depuis des langues très différentes : un Inuit et un Chinois auront
+probablement de grandes difficultés à comprendre intuitivement quel est le mot de l’autre.</p>
+<p>Gonc en bref:</p>
+<ul>
+<li>si vous voulez parler de token, parlez de «token» et pas de «mot».</li>
+<li>et dites comment vous obtenez vos tokens, sinon on ne sait toujours pas vraiment de quoi vous parlez.</li>
+</ul>
+<h1>Bibliographie</h1>
+<p>Ce billet reprend largement des éléments du chapitre 5 de <a href="https://hal.archives-ouvertes.fr/tel-01257201/document" target="_blank" rel="noopener">ma thèse</a>.</p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p>Packard, J. L. (2000). The morphology of Chinese: A linguistic and cognitive approach. Cambridge University Press. <a href="#fnref1" class="footnote-backref">↩</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p>Miller,  P., &amp; Monachesi, P. (2003). Les pronoms clitiques dans les langues  romanes. Langues Romanes, problemes de la phrase simple, 67-123. <a href="#fnref2" class="footnote-backref">↩</a></p>
+</li>
+<li id="fn3" class="footnote-item"><p>http://unicode.org/reports/tr15/ <a href="#fnref3" class="footnote-backref">↩</a></p>
+</li>
+<li id="fn4" class="footnote-item"><p>Allwood, J., Hendrikse, A. P., &amp; Ahlsén, E. (2010). Words and alternative basic units for linguistic analysis. Linguistic theory and raw sound, 40, 9-25. <a href="#fnref4" class="footnote-backref">↩</a></p>
+</li>
+</ol>
+</section>
+</section>
+    <!-- Tags START -->
+    
+    <!-- Tags END -->
+    <!-- NAV START -->
+    
+  <div class="nav-container">
+    <!-- reverse left and right to put prev and next in a more logic postition -->
+    
+      <a class="nav-left" href="/2018/12/05/typematrix/">
+        <span class="nav-arrow">← </span>
+        
+          Passer Au Bépo TypeMatrix Sous Linux (Ubuntu)
+        
+      </a>
+    
+    
+      <a class="nav-right" href="/2018/12/09/PlayingWithMammo/">
+        
+          Playing With Mammographic Masses !
+        
+        <span class="nav-arrow"> →</span>
+      </a>
+    
+  </div>
+
+    <!-- NAV END -->
+    <!-- 打赏 START -->
+    
+    <!-- 打赏 END -->
+    <!-- 二维码 START -->
+    
+    <!-- 二维码 END -->
+    
+      <!-- No Comment -->
+    
+  </article>
+  <!-- Article END -->
+  <!-- Catalog START -->
+  
+    <aside class="catalog-container">
+  <div class="toc-main">
+    <strong class="toc-title">Catalog</strong>
+    
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Un mot, c’est quoi ?</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots syntaxiques</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots morphologiques</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots lexicaux</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Mots sémantiques</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">On fait comment en NLP du coup ?</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Tokénisation</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Segmentation</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Systèmes d’écriture scriptio continua</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Systèmes «sur-segmentés»</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Conclusion</span></a></li><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Bibliographie</span></a></li></ol>
+    
+  </div>
+</aside>
+  
+  <!-- Catalog END -->
+</main>
+
+<script>
+  (function () {
+    var url = 'https://valerie-hanoka.github.io/2018/12/09/LeMot/';
+    var banner = ''
+    if (banner !== '' && banner !== 'undefined' && banner !== 'null') {
+      $('#article-banner').css({
+        'background-image': 'url(' + banner + ')'
+      })
+    } else {
+      $('#article-banner').geopattern(url+"333", {color: '#a1a1a1'})
+    }
+    $('.header').removeClass('fixed-header')
+
+     // error image
+    $(".markdown-content img").on('error', function() {
+      $(this).attr('src', 'http://file.muyutech.com/error-img.png')
+      $(this).css({
+        'cursor': 'default'
+      })
+    })
+
+    // zoom image
+    $(".markdown-content img").on('click', function() {
+      var src = $(this).attr('src')
+      if (src !== 'http://file.muyutech.com/error-img.png') {
+        var imageW = $(this).width()
+        var imageH = $(this).height()
+        
+        var zoom = ($(window).width() * 0.95 / imageW).toFixed(2)
+        zoom = zoom < 1 ? 1 : zoom
+        zoom = zoom > 2 ? 2 : zoom
+        var transY = (($(window).height() - imageH) / 2).toFixed(2)
+
+        $('body').append('<div class="image-view-wrap"><div class="image-view-inner"><img src="'+ src +'" /></div></div>')
+        $('.image-view-wrap').addClass('wrap-active')
+        $('.image-view-wrap img').css({
+          'width': `${imageW}`,
+          'transform': `translate3d(0, ${transY}px, 0) scale3d(${zoom}, ${zoom}, 1)`
+        })
+        $('html').css('overflow', 'hidden')
+
+        $('.image-view-wrap').on('click', function() {
+          $(this).remove()
+          $('html').attr('style', '')
+        })
+      }
+    })
+
+    // qrcode
+    var qr = new QRious({
+      element: document.getElementById('share-qrcode'),
+      value: document.location.href
+    });
+
+    // gitment
+    var gitmentConfig = "";
+    if (gitmentConfig !== 'undefined') {
+      var gitment = new Gitment({
+        id: "Non, Un Token N'est Pas Un mot...",
+        owner: "",
+        repo: "",
+        oauth: {
+          client_id: "",
+          client_secret: ""
+        },
+        theme: {
+          render(state, instance) {
+            const container = document.createElement('div')
+            container.lang = "en-US"
+            container.className = 'gitment-container gitment-root-container'
+            container.appendChild(instance.renderHeader(state, instance))
+            container.appendChild(instance.renderEditor(state, instance))
+            container.appendChild(instance.renderComments(state, instance))
+            container.appendChild(instance.renderFooter(state, instance))
+            return container;
+          }
+        }
+      })
+      gitment.render(document.getElementById('comments'))
+    }
+  })();
+</script>
+
+<script>
+  var disqus_shortname = '';
+  
+  var disqus_url = 'https://valerie-hanoka.github.io/2018/12/09/LeMot/';
+  
+  (function(){
+    var dsq = document.createElement('script');
+    dsq.type = 'text/javascript';
+    dsq.async = true;
+    dsq.src = '//go.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+  })();
+</script>
+
+    <div class="scroll-top">
+  <span class="arrow-icon"></span>
+</div>
+    <footer class="app-footer">
+  <p class="copyright">
+    &copy; 2018 | Proudly powered by <a href="https://hexo.io" target="_blank">Hexo</a>
+    <br>
+    Theme by <a href="https://github.com/yanm1ng">yanm1ng</a>, adapted by Valérie Hanoka.
+  </p>
+</footer>
+
+<script>
+  function async(u, c) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+</script>
+<script>
+  async("//cdn.bootcss.com/fastclick/1.0.6/fastclick.min.js", function(){
+    FastClick.attach(document.body);
+  })
+</script>
+
+<script>
+  var hasLine = 'true';
+  async("//cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js", function(){
+    $('figure pre').each(function(i, block) {
+      var figure = $(this).parents('figure');
+      if (hasLine === 'false') {
+        figure.find('.gutter').hide();
+      }
+      var lang = figure.attr('class').split(' ')[1] || 'code';
+      var codeHtml = $(this).html();
+      var codeTag = document.createElement('code');
+      codeTag.className = lang;
+      codeTag.innerHTML = codeHtml;
+      $(this).attr('class', '').empty().html(codeTag);
+      figure.attr('data-lang', lang.toUpperCase());
+      hljs.highlightBlock(block);
+    });
+  })
+</script>
+<!-- Baidu Tongji -->
+
+<script src="/js/script.js"></script>
+  </body>
+</html>

@@ -139,7 +139,7 @@
 
     <div id="article-banner">
   <h2>Playing With Mammographic Masses !</h2>
-  <p class="post-date">05-12-2018</p>
+  <p class="post-date">09-12-2018</p>
   <div class="arrow-down">
     <a href="javascript:;"></a>
   </div>
@@ -147,27 +147,33 @@
 <main class="app-body flex-box">
   <!-- Article START -->
   <article class="post-article">
-    <section class="markdown-content"><p><em>Or how to play for way too long with a few features on a toy dataset.</em>
-<a id="more"></a></p>
-<p>The dataset is available at <a href="http://archive.ics.uci.edu/ml/datasets/Mammographic+Mass" target="_blank" rel="noopener">http://archive.ics.uci.edu/ml/datasets/Mammographic+Mass</a>.</p>
-<p>There are 961 examples to train binary classifiers on 5 features in total (1 non-predictive (<code>BI-RADS</code>) and 4 predictive attributes (<code>Age</code>, <code>Shape</code>, <code>Margin</code>, <code>Density</code>)).</p>
+    <section class="markdown-content"><p><em>Or how to play for way too long with a few features on a toy dataset.</em></p>
+<a id="more"></a>
+<p>According to <a href="https://www.mdpi.com/2072-6694/7/2/908" target="_blank" rel="noopener">McGuire et al. (2015)</a>, breast cancer is the most common invasive cancer in women as it affects about 12% of women worldwide.
+It is a complex condition, whose treatment choices are based on a classification.
+The different types of breast cancers are each treated according to the best evidence available (see the <a href="https://en.wikipedia.org/wiki/Breast_cancer_classification" target="_blank" rel="noopener">breast cancer classification wikipedia page</a>).</p>
+<p>The dataset we use for this exercise can be found in the <a href="http://archive.ics.uci.edu/ml/datasets/Mammographic+Mass" target="_blank" rel="noopener">UC Irvine Machine Learning Repository</a>.</p>
+<p>The labels to predict correspond to the severity of the cancer: benign (0) or malignant (1).
+There are 961 examples to train binary classifiers on 5 features in total (1 non-predictive (<code>BI-RADS</code>) and 4 predictive attributes (<code>Age</code>, <code>Shape</code>, <code>Margin</code>, <code>Density</code>)).</p>
+<p>This toy dataset does not reflect the complexity and variety of the disease, but is nonetheless famous in the ML community for learning purposes.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</span><br><span class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> sklearn</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> Pipeline</span><br><span class="line"><span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler, PolynomialFeatures</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> ShuffleSplit, cross_val_score, learning_curve</span><br><span class="line"><span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> fbeta_score, make_scorer</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> sklearn.dummy <span class="keyword">import</span> DummyClassifier</span><br><span class="line"><span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LogisticRegression</span><br><span class="line"><span class="keyword">from</span> sklearn.tree <span class="keyword">import</span> DecisionTreeClassifier</span><br><span class="line"><span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> RandomForestClassifier</span><br><span class="line"><span class="keyword">from</span> sklearn.svm <span class="keyword">import</span> SVC</span><br><span class="line"><span class="keyword">from</span> sklearn.neighbors <span class="keyword">import</span> KNeighborsClassifier</span><br></pre></td></tr></table></figure>
-<h2 id="1-Loading-and-cleaning-the-data"><a href="#1-Loading-and-cleaning-the-data" class="headerlink" title="1 - Loading and cleaning the data"></a>1 - Loading and cleaning the data</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">raw_data = pd.read_csv(</span><br><span class="line">    <span class="string">"mammographic_masses.data.txt"</span>,</span><br><span class="line">    names=[<span class="string">"BI_RADS_assessment"</span>, <span class="string">"Age"</span>, <span class="string">"Shape"</span>, <span class="string">"Margin"</span>, <span class="string">"Density"</span>, <span class="string">"Severity"</span>],</span><br><span class="line">    na_values = [<span class="string">'?'</span>]</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">x_cols=[<span class="string">"BI_RADS_assessment"</span>, <span class="string">"Age"</span>, <span class="string">"Shape"</span>, <span class="string">"Margin"</span>, <span class="string">"Density"</span>]</span><br><span class="line">y_col=<span class="string">"Severity"</span></span><br><span class="line"></span><br><span class="line">raw_data.describe()</span><br></pre></td></tr></table></figure>
+<h2>1 - Loading and cleaning the data</h2>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">raw_data = pd.read_csv(</span><br><span class="line">    <span class="string">"mammographic_masses.data.txt"</span>,</span><br><span class="line">    names=[<span class="string">"BI_RADS_assessment"</span>, <span class="string">"Age"</span>, <span class="string">"Shape"</span>, <span class="string">"Margin"</span>, <span class="string">"Density"</span>, <span class="string">"Severity"</span>],</span><br><span class="line">    na_values = [<span class="string">'?'</span>]</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">x_cols=[<span class="string">"BI_RADS_assessment"</span>, <span class="string">"Age"</span>, <span class="string">"Shape"</span>, <span class="string">"Margin"</span>, <span class="string">"Density"</span>]</span><br><span class="line">y_col=<span class="string">"Severity"</span></span><br><span class="line"></span><br><span class="line">raw_data.describe()</span><br></pre></td></tr></table></figure>
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
 </style>
-<table border="1" class="dataframe">
+<table border="0" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -255,11 +261,9 @@
   </tbody>
 </table>
 </div>
-
-
-
-<p>Seems there are quite a few missing values. What are they, and is it safe to remove them ? </p>
-<h3 id="Dealing-with-missing-values"><a href="#Dealing-with-missing-values" class="headerlink" title="Dealing with missing values"></a>Dealing with missing values</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">na_data = raw_data[raw_data.isnull().any(axis = <span class="number">1</span>)]</span><br><span class="line">na_data.isna().sum()</span><br></pre></td></tr></table></figure>
+<p>Seems there are quite a few missing values. What are they, and is it safe to remove them ?</p>
+<h3>Dealing with missing values</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">na_data = raw_data[raw_data.isnull().any(axis = <span class="number">1</span>)]</span><br><span class="line">na_data.isna().sum()</span><br></pre></td></tr></table></figure>
 <pre><code>BI_RADS_assessment     2
 Age                    5
 Shape                 31
@@ -267,23 +271,24 @@ Margin                48
 Density               76
 Severity               0
 dtype: int64
-</code></pre><p>Most missing values are found in columns <code>Shape</code>, <code>Margin</code> and <code>Density</code></p>
+</code></pre>
+<p>Most missing values are found in columns <code>Shape</code>, <code>Margin</code> and <code>Density</code></p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">na_data.describe()</span><br></pre></td></tr></table></figure>
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
 </style>
-<table border="1" class="dataframe">
+<table border="0" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -371,32 +376,28 @@ dtype: int64
   </tbody>
 </table>
 </div>
-
-
-
-
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">NaN_viz_value = <span class="number">-5</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># We replace NaNs with NaN_viz_value in order to identify them in the following visualization</span></span><br><span class="line"></span><br><span class="line">g = sns.pairplot(na_data.fillna(NaN_viz_value), hue=<span class="string">"Severity"</span>, markers=[<span class="string">"x"</span>, <span class="string">"o"</span>])</span><br><span class="line"><span class="keyword">for</span> ax <span class="keyword">in</span> g.axes.flat: </span><br><span class="line">    ax.axvline(NaN_viz_value, linewidth=<span class="number">1</span>, color=<span class="string">'red'</span>, ls=<span class="string">'--'</span>)</span><br></pre></td></tr></table></figure>
-<img src="/2018/12/05/PlayingWithMammo/output_10_0.png">
-<p>N.B: The values of NaN were replaced by a negative value for this plot. </p>
+<img src="/2018/12/09/PlayingWithMammo/output_10_0.png">
+<p>N.B: The values of NaN were replaced by a negative value for this plot.</p>
 <p>The missing data seems to be randomly distributed.
 We can not infer any missing values from that, so we may get rid of it.
-On the top left plot (<code>BI_RADS_assessment</code>), there is something confusing: while the values are supposed to range from 1 to 5, the scale looks rather odd. We can suspect there are outlyers there. </p>
+On the top left plot (<code>BI_RADS_assessment</code>), there is something confusing: while the values are supposed to range from 1 to 5, the scale looks rather odd. We can suspect there are outlyers there.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data = raw_data.dropna()</span><br><span class="line">data.describe()</span><br></pre></td></tr></table></figure>
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
 </style>
-<table border="1" class="dataframe">
+<table border="0" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -484,21 +485,20 @@ On the top left plot (<code>BI_RADS_assessment</code>), there is something confu
   </tbody>
 </table>
 </div>
-
-
-
-<h3 id="Dealing-with-outliers"><a href="#Dealing-with-outliers" class="headerlink" title="Dealing with outliers"></a>Dealing with outliers</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">fig = plt.figure(figsize=(<span class="number">15</span>, <span class="number">12</span>))</span><br><span class="line"></span><br><span class="line">n_feat = len(x_cols)</span><br><span class="line">ax_num = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> col <span class="keyword">in</span> x_cols:</span><br><span class="line">    </span><br><span class="line">    ax_num+=<span class="number">1</span></span><br><span class="line">    ax = fig.add_subplot(n_feat, <span class="number">6</span>, ax_num)</span><br><span class="line">    ax.boxplot(data[col])</span><br><span class="line">    ax.set_title(col)</span><br><span class="line">    </span><br><span class="line">    ax_num+=<span class="number">1</span></span><br><span class="line">    ax = fig.add_subplot(n_feat, <span class="number">6</span>, ax_num)</span><br><span class="line">    ax.hist(data[col])</span><br><span class="line">    ax.set_title(col)</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">plt.tight_layout()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
-<img src="/2018/12/05/PlayingWithMammo/output_14_0.png">
+<h3>Dealing with outliers</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">fig = plt.figure(figsize=(<span class="number">15</span>, <span class="number">12</span>))</span><br><span class="line"></span><br><span class="line">n_feat = len(x_cols)</span><br><span class="line">ax_num = <span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> col <span class="keyword">in</span> x_cols:</span><br><span class="line">    </span><br><span class="line">    ax_num+=<span class="number">1</span></span><br><span class="line">    ax = fig.add_subplot(n_feat, <span class="number">6</span>, ax_num)</span><br><span class="line">    ax.boxplot(data[col])</span><br><span class="line">    ax.set_title(col)</span><br><span class="line">    </span><br><span class="line">    ax_num+=<span class="number">1</span></span><br><span class="line">    ax = fig.add_subplot(n_feat, <span class="number">6</span>, ax_num)</span><br><span class="line">    ax.hist(data[col])</span><br><span class="line">    ax.set_title(col)</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"></span><br><span class="line">plt.tight_layout()</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<img src="/2018/12/09/PlayingWithMammo/output_14_0.png">
 <p>There is a serious issue with <code>BI_RADS_assessment</code> values. According to the dataset documentation, their range is supposed to be [1,5]. But other values are present:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">BI_RADS_values = data.BI_RADS_assessment.value_counts()</span><br><span class="line">BI_RADS_values[np.logical_or(BI_RADS_values.index&lt;<span class="number">1</span>, BI_RADS_values.index&gt;<span class="number">5</span>)]</span><br></pre></td></tr></table></figure>
 <pre><code>6.0     9
 0.0     5
 55.0    1
 Name: BI_RADS_assessment, dtype: int64
-</code></pre><p>3 values with undefined semantics ([0; 6; 55]) are present multiple times in this column. 
+</code></pre>
+<p>3 values with undefined semantics ([0; 6; 55]) are present multiple times in this column.
 Looking at the <a href="https://en.wikipedia.org/wiki/BI-RADS" target="_blank" rel="noopener">wikipedia page for this field</a>, we can see that 6 and 0 are also authorized values. That would explain why they appear more than once in this dataset.
-I chose to keep those values. </p>
-<p>Another oddity in this column is that there is no 1. Anyway, just for the sake of this exercise, we’ll keep that column even if it does not seem neat.  </p>
+I chose to keep those values.</p>
+<p>Another oddity in this column is that there is no 1. Anyway, just for the sake of this exercise, we’ll keep that column even if it does not seem neat.</p>
 <p>The remaining row, where the <code>BI_RADS_assessment</code> is 55, is far too nonsensical and may be discarded:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">data = data[data.BI_RADS_assessment != <span class="number">55</span>]</span><br><span class="line">data.BI_RADS_assessment.value_counts()</span><br></pre></td></tr></table></figure>
 <pre><code>4.0    468
@@ -508,11 +508,13 @@ I chose to keep those values. </p>
 2.0      7
 0.0      5
 Name: BI_RADS_assessment, dtype: int64
-</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">fig = plt.figure()</span><br><span class="line">    </span><br><span class="line">ax = fig.add_subplot(<span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>)</span><br><span class="line">ax.boxplot(data.BI_RADS_assessment)</span><br><span class="line">ax.set_title(<span class="string">"BI_RADS_assessment"</span>)</span><br><span class="line">    </span><br><span class="line">ax = fig.add_subplot(<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line">ax.hist(data.BI_RADS_assessment)</span><br><span class="line">ax.set_title(<span class="string">"BI_RADS_assessment"</span>)</span><br><span class="line">    </span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
-<img src="/2018/12/05/PlayingWithMammo/output_19_0.png">
+</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">fig = plt.figure()</span><br><span class="line">    </span><br><span class="line">ax = fig.add_subplot(<span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>)</span><br><span class="line">ax.boxplot(data.BI_RADS_assessment)</span><br><span class="line">ax.set_title(<span class="string">"BI_RADS_assessment"</span>)</span><br><span class="line">    </span><br><span class="line">ax = fig.add_subplot(<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line">ax.hist(data.BI_RADS_assessment)</span><br><span class="line">ax.set_title(<span class="string">"BI_RADS_assessment"</span>)</span><br><span class="line">    </span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<img src="/2018/12/09/PlayingWithMammo/output_19_0.png">
 <p>Other features ranges seems to correspond to what is announced in this dataset README, so let’s roll with it.</p>
-<h3 id="Are-our-features-correlated"><a href="#Are-our-features-correlated" class="headerlink" title="Are our features correlated ?"></a>Are our features correlated ?</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">corr = data.corr()</span><br><span class="line"></span><br><span class="line"><span class="comment"># Generate a mask for the upper triangle</span></span><br><span class="line">mask = np.zeros_like(corr, dtype=np.bool)</span><br><span class="line">mask[np.triu_indices_from(mask)] = <span class="keyword">True</span></span><br><span class="line"></span><br><span class="line">g = sns.heatmap(</span><br><span class="line">    corr,</span><br><span class="line">    cmap=sns.light_palette(<span class="string">"green"</span>),</span><br><span class="line">    mask=mask, </span><br><span class="line">    square=<span class="keyword">True</span>,</span><br><span class="line">    linewidths=<span class="number">1</span>, </span><br><span class="line">    annot=corr</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
-<img src="/2018/12/05/PlayingWithMammo/output_22_0.png">
+<h3>Are our features correlated ?</h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">corr = data.corr()</span><br><span class="line"></span><br><span class="line"><span class="comment"># Generate a mask for the upper triangle</span></span><br><span class="line">mask = np.zeros_like(corr, dtype=np.bool)</span><br><span class="line">mask[np.triu_indices_from(mask)] = <span class="keyword">True</span></span><br><span class="line"></span><br><span class="line">g = sns.heatmap(</span><br><span class="line">    corr,</span><br><span class="line">    cmap=sns.light_palette(<span class="string">"green"</span>),</span><br><span class="line">    mask=mask, </span><br><span class="line">    square=<span class="keyword">True</span>,</span><br><span class="line">    linewidths=<span class="number">1</span>, </span><br><span class="line">    annot=corr</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+<img src="/2018/12/09/PlayingWithMammo/output_22_0.png">
 <p>Margin and shape are a bit correlated. But as far as we have a very small set of features, it does not matter much.</p>
 <p>Before going further, let’s have a final look at the data.</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data.describe()</span><br></pre></td></tr></table></figure>
@@ -521,16 +523,16 @@ Name: BI_RADS_assessment, dtype: int64
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
 </style>
-<table border="1" class="dataframe">
+<table border="0" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -618,30 +620,26 @@ Name: BI_RADS_assessment, dtype: int64
   </tbody>
 </table>
 </div>
-
-
-
-
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data.pivot_table(index=<span class="string">"Severity"</span>, aggfunc=[np.mean, np.median])</span><br></pre></td></tr></table></figure>
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
+.dataframe thead tr th {
+    text-align: left;
+}
 
-    .dataframe thead tr th {
-        text-align: left;
-    }
-
-    .dataframe thead tr:last-of-type th {
-        text-align: right;
-    }
+.dataframe thead tr:last-of-type th {
+    text-align: right;
+}
+</code></pre>
 </style>
-<table border="1" class="dataframe">
+<table border="0" class="dataframe">
   <thead>
     <tr>
       <th></th>
@@ -705,63 +703,69 @@ Name: BI_RADS_assessment, dtype: int64
   </tbody>
 </table>
 </div>
-
-
-
-
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">g = sns.pairplot(</span><br><span class="line">    data,</span><br><span class="line">    markers=[<span class="string">"x"</span>, <span class="string">"o"</span>],</span><br><span class="line">    hue=<span class="string">'Severity'</span>,</span><br><span class="line">    vars=([<span class="string">"BI_RADS_assessment"</span>,</span><br><span class="line">          <span class="string">"Age"</span>,</span><br><span class="line">          <span class="string">"Shape"</span>,</span><br><span class="line">          <span class="string">"Margin"</span>,</span><br><span class="line">          <span class="string">"Density"</span>]))</span><br></pre></td></tr></table></figure>
-<img src="/2018/12/05/PlayingWithMammo/output_26_0.png">
-<p>829 training exemples, 5 features whose values seems legit. We can proceed to the fun part. </p>
-<h2 id="2-Comparing-toy-models-on-this-dataset"><a href="#2-Comparing-toy-models-on-this-dataset" class="headerlink" title="2 - Comparing toy models on this dataset"></a>2 - Comparing toy models on this dataset</h2><p>The choice of the metric used to compare models here depends on our approach: Do we want to avoid erroneously predict breast cancers (thus calling for unnecessary chirurgical procedures), or do we prefer to detect all the cancers, even if it means wrongly announcing to some women they have breast cancer ? </p>
-<p>For this exercise, I’ll assume that false negatives (undetected cancers) are probably worse than false positives (false cancer diagnoses). 
-I will thus use $\displaystyle F_{2}$ measure, which weighs recall higher than precision by placing more emphasis on false negatives. </p>
-<h3 id="Baselines"><a href="#Baselines" class="headerlink" title="Baselines"></a>Baselines</h3><p>We will first try a bunch of classifiers on this dataset:</p>
+<img src="/2018/12/09/PlayingWithMammo/output_26_0.png">
+<p>829 training exemples, 5 features whose values seems legit. We can proceed to the fun part.</p>
+<h2>2 - Comparing toy models on this dataset</h2>
+<p>The choice of the metric used to compare models here depends on our approach: Do we want to avoid erroneously predict breast cancers (thus calling for unnecessary chirurgical procedures), or do we prefer to detect all the cancers, even if it means wrongly announcing to some women they have breast cancer ?</p>
+<p>For this exercise, I’ll assume that false negatives (undetected cancers) are probably worse than false positives (false cancer diagnoses).
+I will thus use $\displaystyle F_{2}$ measure, which weighs recall higher than precision by placing more emphasis on false negatives.</p>
+<h3>Baselines</h3>
+<p>We will first try a bunch of classifiers on this dataset:</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">baseline_estimators = [</span><br><span class="line">    DummyClassifier(),</span><br><span class="line">    LogisticRegression(solver=<span class="string">'lbfgs'</span>),</span><br><span class="line">    DecisionTreeClassifier(random_state=<span class="number">1</span>),</span><br><span class="line">    RandomForestClassifier(n_estimators=<span class="number">30</span>, random_state=<span class="number">1</span>),</span><br><span class="line">    SVC(kernel=<span class="string">'linear'</span>),</span><br><span class="line">    SVC(kernel=<span class="string">'rbf'</span>),</span><br><span class="line">    SVC(kernel=<span class="string">'poly'</span>),</span><br><span class="line">    KNeighborsClassifier(),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
-<p>Let’s set up an easy way to train, evaluate and diagnose those baseline models, by visualising learning curves and estimated classifiers scores: </p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">########  VISUALISATION  ########</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_learning_curve</span><span class="params">(estimator, title, X, y, ylim=None, cv=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                        n_jobs=None, train_sizes=np.linspace<span class="params">(<span class="number">.1</span>, <span class="number">1.0</span>, <span class="number">5</span>)</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Generate a simple plot of the test and training learning curve.</span></span><br><span class="line"><span class="string">    Taken from</span></span><br><span class="line"><span class="string">    https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    plt.figure()</span><br><span class="line">    plt.title(title)</span><br><span class="line">    <span class="keyword">if</span> ylim <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">        plt.ylim(*ylim)</span><br><span class="line">    plt.xlabel(<span class="string">"Training examples"</span>)</span><br><span class="line">    plt.ylabel(<span class="string">"Score"</span>)</span><br><span class="line">    train_sizes, train_scores, test_scores = learning_curve(</span><br><span class="line">        estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes)</span><br><span class="line">    train_scores_mean = np.mean(train_scores, axis=<span class="number">1</span>)</span><br><span class="line">    train_scores_std = np.std(train_scores, axis=<span class="number">1</span>)</span><br><span class="line">    test_scores_mean = np.mean(test_scores, axis=<span class="number">1</span>)</span><br><span class="line">    test_scores_std = np.std(test_scores, axis=<span class="number">1</span>)</span><br><span class="line">    plt.grid()</span><br><span class="line"></span><br><span class="line">    plt.fill_between(train_sizes, train_scores_mean - train_scores_std,</span><br><span class="line">                     train_scores_mean + train_scores_std, alpha=<span class="number">0.1</span>,</span><br><span class="line">                     color=<span class="string">"r"</span>)</span><br><span class="line">    plt.fill_between(train_sizes, test_scores_mean - test_scores_std,</span><br><span class="line">                     test_scores_mean + test_scores_std, alpha=<span class="number">0.1</span>, color=<span class="string">"g"</span>)</span><br><span class="line">    plt.plot(train_sizes, train_scores_mean, <span class="string">'o-'</span>, color=<span class="string">"r"</span>,</span><br><span class="line">             label=<span class="string">"Training score"</span>)</span><br><span class="line">    plt.plot(train_sizes, test_scores_mean, <span class="string">'o-'</span>, color=<span class="string">"g"</span>,</span><br><span class="line">             label=<span class="string">"Cross-validation score"</span>)</span><br><span class="line"></span><br><span class="line">    plt.legend(loc=<span class="string">"best"</span>)</span><br><span class="line">    plt.tight_layout()</span><br><span class="line">    <span class="keyword">return</span> plt</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_classif_scores</span><span class="params">(scores)</span>:</span></span><br><span class="line">    <span class="string">""" Builds a plot for easy comparison of models."""</span></span><br><span class="line">    sorted_mean_scores = scores.apply(np.mean).sort_values()</span><br><span class="line">    print(sorted_mean_scores)</span><br><span class="line">    </span><br><span class="line">    sns.set(style=<span class="string">"whitegrid"</span>)</span><br><span class="line">    fig = plt.figure(figsize=(<span class="number">10</span>,<span class="number">8</span>))</span><br><span class="line">    plt.xticks(np.arange(<span class="number">0.1</span>, <span class="number">1.1</span>, <span class="number">0.05</span>))</span><br><span class="line">    ax = sns.boxplot(data=scores, orient=<span class="string">'h'</span>, order=sorted_mean_scores.index)</span><br><span class="line">    ax = sns.swarmplot(data=scores, color=<span class="string">".10"</span>, orient=<span class="string">'h'</span>, order=sorted_mean_scores.index)</span><br><span class="line">    ax.set_xlabel(<span class="string">"F2 score"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_short_classifiers_name</span><span class="params">(classifiers_name)</span>:</span></span><br><span class="line">    <span class="string">"""Shorten the name of a classifier, for visualisation purposes."""</span></span><br><span class="line">    important_parameters = re.compile(<span class="string">"((kernel|C)=[^,]*),"</span>)</span><br><span class="line">    matches = re.findall(important_parameters, classifiers_name)</span><br><span class="line">    params = <span class="string">", "</span>.join([m[<span class="number">0</span>:<span class="number">10</span>] <span class="keyword">for</span> m, _ <span class="keyword">in</span> matches]) <span class="keyword">if</span> matches <span class="keyword">else</span> <span class="string">""</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"%s(%s)"</span>%(classifiers_name.split(<span class="string">"("</span>)[<span class="number">0</span>], params)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">########  SCORE ESTIMATION + LEARNING CURVES  ########</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cross_validate_estimator</span><span class="params">(estimator_class,</span></span></span><br><span class="line"><span class="function"><span class="params">                             shortened_estimator_name,</span></span></span><br><span class="line"><span class="function"><span class="params">                             X=X, y=y,</span></span></span><br><span class="line"><span class="function"><span class="params">                             n_splits=<span class="number">10</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                             polynomial=False,</span></span></span><br><span class="line"><span class="function"><span class="params">                             plot_learning_curves=True)</span>:</span></span><br><span class="line">    <span class="string">"""Cross-validate and plot learning curves for a given classifier."""</span></span><br><span class="line">    </span><br><span class="line">    cv = ShuffleSplit(n_splits=n_splits, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line">    pipeline_steps = [</span><br><span class="line">        (<span class="string">'scaler'</span>, StandardScaler()), <span class="comment"># Data Normalization</span></span><br><span class="line">        (<span class="string">'clf'</span>, estimator_class)</span><br><span class="line">    ]</span><br><span class="line">    <span class="keyword">if</span> polynomial:</span><br><span class="line">        pipeline_steps[<span class="number">1</span>:<span class="number">1</span>] = [(<span class="string">'poly2'</span>, PolynomialFeatures(<span class="number">2</span>))]</span><br><span class="line">    </span><br><span class="line">    pipeline =  Pipeline(pipeline_steps)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> plot_learning_curves:</span><br><span class="line">        plot_learning_curve(</span><br><span class="line">            pipeline,</span><br><span class="line">            <span class="string">"learning curve for %s"</span> % shortened_estimator_name,</span><br><span class="line">            X, y, cv=cv,</span><br><span class="line">            train_sizes=np.linspace(<span class="number">.1</span>, <span class="number">1.0</span>, <span class="number">8</span>))</span><br><span class="line">        plt.draw()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> cross_val_score(</span><br><span class="line">        pipeline, </span><br><span class="line">        X, y, </span><br><span class="line">        cv=cv, </span><br><span class="line">        scoring=f2_score, </span><br><span class="line">        error_score=np.nan </span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+<p>Let’s set up an easy way to train, evaluate and diagnose those baseline models, by visualising learning curves and estimated classifiers scores:</p>
+<h5>Visualisation</h5>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_learning_curve</span><span class="params">(estimator, title, X, y, ylim=None, cv=None,</span></span></span><br><span class="line"><span class="function"><span class="params">                        n_jobs=None, train_sizes=np.linspace<span class="params">(<span class="number">.1</span>, <span class="number">1.0</span>, <span class="number">5</span>)</span>)</span>:</span></span><br><span class="line">    <span class="string">"""</span></span><br><span class="line"><span class="string">    Generate a simple plot of the test and training learning curve.</span></span><br><span class="line"><span class="string">    Taken from</span></span><br><span class="line"><span class="string">    https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    plt.figure()</span><br><span class="line">    plt.title(title)</span><br><span class="line">    <span class="keyword">if</span> ylim <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">        plt.ylim(*ylim)</span><br><span class="line">    plt.xlabel(<span class="string">"Training examples"</span>)</span><br><span class="line">    plt.ylabel(<span class="string">"Score"</span>)</span><br><span class="line">    train_sizes, train_scores, test_scores = learning_curve(</span><br><span class="line">        estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes)</span><br><span class="line">    train_scores_mean = np.mean(train_scores, axis=<span class="number">1</span>)</span><br><span class="line">    train_scores_std = np.std(train_scores, axis=<span class="number">1</span>)</span><br><span class="line">    test_scores_mean = np.mean(test_scores, axis=<span class="number">1</span>)</span><br><span class="line">    test_scores_std = np.std(test_scores, axis=<span class="number">1</span>)</span><br><span class="line">    plt.grid()</span><br><span class="line"></span><br><span class="line">    plt.fill_between(train_sizes, train_scores_mean - train_scores_std,</span><br><span class="line">                     train_scores_mean + train_scores_std, alpha=<span class="number">0.1</span>,</span><br><span class="line">                     color=<span class="string">"r"</span>)</span><br><span class="line">    plt.fill_between(train_sizes, test_scores_mean - test_scores_std,</span><br><span class="line">                     test_scores_mean + test_scores_std, alpha=<span class="number">0.1</span>, color=<span class="string">"g"</span>)</span><br><span class="line">    plt.plot(train_sizes, train_scores_mean, <span class="string">'o-'</span>, color=<span class="string">"r"</span>,</span><br><span class="line">             label=<span class="string">"Training score"</span>)</span><br><span class="line">    plt.plot(train_sizes, test_scores_mean, <span class="string">'o-'</span>, color=<span class="string">"g"</span>,</span><br><span class="line">             label=<span class="string">"Cross-validation score"</span>)</span><br><span class="line"></span><br><span class="line">    plt.legend(loc=<span class="string">"best"</span>)</span><br><span class="line">    plt.tight_layout()</span><br><span class="line">    <span class="keyword">return</span> plt</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">plot_classif_scores</span><span class="params">(scores)</span>:</span></span><br><span class="line">    <span class="string">""" Builds a plot for easy comparison of models."""</span></span><br><span class="line">    sorted_mean_scores = scores.apply(np.mean).sort_values()</span><br><span class="line">    print(sorted_mean_scores)</span><br><span class="line">    </span><br><span class="line">    sns.set(style=<span class="string">"whitegrid"</span>)</span><br><span class="line">    fig = plt.figure(figsize=(<span class="number">10</span>,<span class="number">8</span>))</span><br><span class="line">    plt.xticks(np.arange(<span class="number">0.1</span>, <span class="number">1.1</span>, <span class="number">0.05</span>))</span><br><span class="line">    ax = sns.boxplot(data=scores, orient=<span class="string">'h'</span>, order=sorted_mean_scores.index)</span><br><span class="line">    ax = sns.swarmplot(data=scores, color=<span class="string">".10"</span>, orient=<span class="string">'h'</span>, order=sorted_mean_scores.index)</span><br><span class="line">    ax.set_xlabel(<span class="string">"F2 score"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_short_classifiers_name</span><span class="params">(classifiers_name)</span>:</span></span><br><span class="line">    <span class="string">"""Shorten the name of a classifier, for visualisation purposes."""</span></span><br><span class="line">    important_parameters = re.compile(<span class="string">"((kernel|C)=[^,]*),"</span>)</span><br><span class="line">    matches = re.findall(important_parameters, classifiers_name)</span><br><span class="line">    params = <span class="string">", "</span>.join([m[<span class="number">0</span>:<span class="number">10</span>] <span class="keyword">for</span> m, _ <span class="keyword">in</span> matches]) <span class="keyword">if</span> matches <span class="keyword">else</span> <span class="string">""</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"%s(%s)"</span>%(classifiers_name.split(<span class="string">"("</span>)[<span class="number">0</span>], params)</span><br></pre></td></tr></table></figure>
+<h5>$F_2$-Scores estimation and learning curves</h5>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cross_validate_estimator</span><span class="params">(estimator_class,</span></span></span><br><span class="line"><span class="function"><span class="params">                             shortened_estimator_name,</span></span></span><br><span class="line"><span class="function"><span class="params">                             X=X, y=y,</span></span></span><br><span class="line"><span class="function"><span class="params">                             n_splits=<span class="number">10</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                             polynomial=False,</span></span></span><br><span class="line"><span class="function"><span class="params">                             plot_learning_curves=True)</span>:</span></span><br><span class="line">    <span class="string">"""Cross-validate and plot learning curves for a given classifier."""</span></span><br><span class="line">    </span><br><span class="line">    cv = ShuffleSplit(n_splits=n_splits, test_size=<span class="number">0.2</span>, random_state=<span class="number">42</span>)</span><br><span class="line">    pipeline_steps = [</span><br><span class="line">        (<span class="string">'scaler'</span>, StandardScaler()), <span class="comment"># Data Normalization</span></span><br><span class="line">        (<span class="string">'clf'</span>, estimator_class)</span><br><span class="line">    ]</span><br><span class="line">    <span class="keyword">if</span> polynomial:</span><br><span class="line">        pipeline_steps[<span class="number">1</span>:<span class="number">1</span>] = [(<span class="string">'poly2'</span>, PolynomialFeatures(<span class="number">2</span>))]</span><br><span class="line">    </span><br><span class="line">    pipeline =  Pipeline(pipeline_steps)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> plot_learning_curves:</span><br><span class="line">        plot_learning_curve(</span><br><span class="line">            pipeline,</span><br><span class="line">            <span class="string">"learning curve for %s"</span> % shortened_estimator_name,</span><br><span class="line">            X, y, cv=cv,</span><br><span class="line">            train_sizes=np.linspace(<span class="number">.1</span>, <span class="number">1.0</span>, <span class="number">8</span>))</span><br><span class="line">        plt.draw()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> cross_val_score(</span><br><span class="line">        pipeline, </span><br><span class="line">        X, y, </span><br><span class="line">        cv=cv, </span><br><span class="line">        scoring=f2_score, </span><br><span class="line">        error_score=np.nan </span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">X = data[x_cols]</span><br><span class="line">y = data[y_col]</span><br><span class="line">f2_score = make_scorer(fbeta_score, beta=<span class="number">2</span>)</span><br><span class="line">n_split = <span class="number">20</span></span><br><span class="line"></span><br><span class="line">scores = pd.DataFrame()</span><br><span class="line"><span class="keyword">for</span> est <span class="keyword">in</span> baseline_estimators:</span><br><span class="line">    short_est_name = get_short_classifiers_name(str(est))</span><br><span class="line">    scores[short_est_name] = cross_validate_estimator(est, short_est_name, X, y, n_split)</span><br></pre></td></tr></table></figure>
-<img src="/2018/12/05/PlayingWithMammo/output_32_0.png">
-<p>!<img src="/2018/12/05/PlayingWithMammo/output_32_1.png"></p>
-<img src="/2018/12/05/PlayingWithMammo/output_32_2.png">
-<img src="/2018/12/05/PlayingWithMammo/output_32_3.png">
-<img src="/2018/12/05/PlayingWithMammo/output_32_4.png">
-<img src="/2018/12/05/PlayingWithMammo/output_32_5.png">
-<img src="/2018/12/05/PlayingWithMammo/output_32_6.png">
-<img src="/2018/12/05/PlayingWithMammo/output_32_7.png">
-<h5 id="What-are-the-learning-curves-telling-us"><a href="#What-are-the-learning-curves-telling-us" class="headerlink" title="What are the learning curves telling us ?"></a>What are the learning curves telling us ?</h5><ul>
+<img src="/2018/12/09/PlayingWithMammo/output_32_0.png">
+<p>!<img src="/2018/12/09/PlayingWithMammo/output_32_1.png"></p>
+<img src="/2018/12/09/PlayingWithMammo/output_32_2.png">
+<img src="/2018/12/09/PlayingWithMammo/output_32_3.png">
+<img src="/2018/12/09/PlayingWithMammo/output_32_4.png">
+<img src="/2018/12/09/PlayingWithMammo/output_32_5.png">
+<img src="/2018/12/09/PlayingWithMammo/output_32_6.png">
+<img src="/2018/12/09/PlayingWithMammo/output_32_7.png">
+<h5>What are the learning curves telling us ?</h5>
+<ul>
 <li><code>DummyClassifier</code>: As expected, this classifiers acts dummy.</li>
 <li><code>LogisticRegression(C=1.0)</code>: Seems good, perhaps a bit of <em>biais</em>.</li>
-<li><code>DecisionTreeClassifier</code>: High <em>variance</em> ! </li>
-<li><code>RandomForestClassifier</code>: High <em>variance</em> ! </li>
-<li><code>SVC(C=1.0, kernel=&#39;linear&#39;)</code>: Seems good.</li>
-<li><code>SVC(C=1.0, kernel=&#39;rbf&#39;)</code>: Seems good.</li>
-<li><code>SVC(C=1.0, kernel=&#39;poly&#39;)</code>: Seems good.</li>
+<li><code>DecisionTreeClassifier</code>: High <em>variance</em> !</li>
+<li><code>RandomForestClassifier</code>: High <em>variance</em> !</li>
+<li><code>SVC(C=1.0, kernel='linear')</code>: Seems good.</li>
+<li><code>SVC(C=1.0, kernel='rbf')</code>: Seems good.</li>
+<li><code>SVC(C=1.0, kernel='poly')</code>: Seems good.</li>
 <li><code>KNeighborsClassifier()</code>: Perhaps a bit of <em>variance</em> ?</li>
 </ul>
 <p>Given that this toy dataset is all we have, the <em>variance issue</em> on some models will not be fixed by getting more training data. It may be adressed by increasing the regularisation constant.</p>
-<p>On the other hand, for (suspected) <em>biais issues</em>, tweaking the existing features (e.g. adding polynomial features) or decreasing the regularisation constant may help.  </p>
-<h5 id="What-are-the-estimated-scores-for-each-model"><a href="#What-are-the-estimated-scores-for-each-model" class="headerlink" title="What are the estimated scores for each model ?"></a>What are the estimated scores for each model ?</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot_classif_scores(scores)</span><br></pre></td></tr></table></figure>
+<p>On the other hand, for (suspected) <em>biais issues</em>, tweaking the existing features (e.g. adding polynomial features) or decreasing the regularisation constant may help.</p>
+<h5>What are the estimated scores for each model ?</h5>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot_classif_scores(scores)</span><br></pre></td></tr></table></figure>
 <pre><code>DummyClassifier()            0.480737
 DecisionTreeClassifier()     0.735508
-SVC(C=1.0, kernel=&apos;li)       0.757988
-SVC(C=1.0, kernel=&apos;po)       0.758442
+SVC(C=1.0, kernel='li)       0.757988
+SVC(C=1.0, kernel='po)       0.758442
 RandomForestClassifier()     0.776284
 KNeighborsClassifier()       0.793834
-SVC(C=1.0, kernel=&apos;rb)       0.797301
+SVC(C=1.0, kernel='rb)       0.797301
 LogisticRegression(C=1.0)    0.822784
 dtype: float64
-</code></pre><p>!<img src="/2018/12/05/PlayingWithMammo/output_34_1.png"></p>
-<p>The <code>DummyClassifier</code> is used as a sanity test: other classifiers must perform significantly better. That’s the case here. 
-In the previous plot, classifiers results on cross-validation splits are ordered by $\displaystyle F_{2}$ mean. 
+</code></pre>
+<p>!<img src="/2018/12/09/PlayingWithMammo/output_34_1.png"></p>
+<p>The <code>DummyClassifier</code> is used as a sanity test: other classifiers must perform significantly better. That’s the case here.
+In the previous plot, classifiers results on cross-validation splits are ordered by $\displaystyle F_{2}$ mean.
 The best performing classifiers for this task on this data are:</p>
 <ul>
 <li><code>KNeighborsClassifier (n_neighbors=15)</code> $\rightarrow \displaystyle F_{2} \approx 0.78$</li>
-<li><code>SVC (kernel=&#39;rbf&#39;)</code> $\rightarrow \displaystyle F_{2} \approx 0.80$</li>
-<li><code>LogisticRegression (solver=&#39;lbfgs&#39;)</code> $\rightarrow \displaystyle F_{2} \approx 0.82$</li>
+<li><code>SVC (kernel='rbf')</code> $\rightarrow \displaystyle F_{2} \approx 0.80$</li>
+<li><code>LogisticRegression (solver='lbfgs')</code> $\rightarrow \displaystyle F_{2} \approx 0.82$</li>
 </ul>
-<h3 id="Improving-the-3-best-models"><a href="#Improving-the-3-best-models" class="headerlink" title="Improving the 3-best models"></a>Improving the 3-best models</h3><p>Let’s improve the most promising baselines.
+<h3>Improving the 3-best models</h3>
+<p>Let’s improve the most promising baselines.
 From their learning curves, we suspected that they may suffer from <em>variance</em> (<code>KNeighborsClassifier()</code>) or <em>biais</em> (<code>LogisticRegression(C=1.0)</code>).</p>
-<h5 id="Logistic-regression"><a href="#Logistic-regression" class="headerlink" title="Logistic regression"></a>Logistic regression</h5><p>Let’s try first to fix the biais for logistic regression. Our two options are:</p>
+<h5>Logistic regression</h5>
+<p>Let’s try first to fix the biais for logistic regression. Our two options are:</p>
 <ol>
 <li>adding polynomial features and</li>
 <li>decreasing the regularisation constant.</li>
@@ -773,16 +777,16 @@ From their learning curves, we suspected that they may suffer from <em>variance<
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
 </style>
-<table border="1" class="dataframe">
+<table border="0" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -825,11 +829,9 @@ From their learning curves, we suspected that they may suffer from <em>variance<
   </tbody>
 </table>
 </div>
-
-
-
-<p>We gained more than 1 point of $F_2$ score (new best $F_2 \approx 0.84$) with a LogisticRegression model (solver=’lbfgs’, C=0.001947) using order 2 polynomial/interaction features and a regularization constant $\approx 0.002$.</p>
-<h5 id="KNN"><a href="#KNN" class="headerlink" title="KNN"></a>KNN</h5><p>Let’s try then to improve KNN by changing some parameters : </p>
+<p>We gained more than 1 point of $F_2$ score (new best $F_2 \approx 0.84$) with a LogisticRegression model (solver=“lbfgs”, C=0.001947) using order 2 polynomial/interaction features and a regularization constant $\approx 0.002$.</p>
+<h5>KNN</h5>
+<p>Let’s try then to improve KNN by changing some parameters :</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">scores= []</span><br><span class="line">knns = np.linspace(<span class="number">1</span>, <span class="number">21</span>, <span class="number">20</span>)</span><br><span class="line">algos = [<span class="string">'ball_tree'</span>, <span class="string">'kd_tree'</span>, <span class="string">'brute'</span>]</span><br><span class="line">weights = [<span class="string">'uniform'</span>, <span class="string">"distance"</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> knn <span class="keyword">in</span> knns:</span><br><span class="line">    knn = int(knn)</span><br><span class="line">    <span class="keyword">for</span> algo <span class="keyword">in</span> algos:</span><br><span class="line">        <span class="keyword">for</span> weight <span class="keyword">in</span> weights:</span><br><span class="line">            est = KNeighborsClassifier(</span><br><span class="line">                n_neighbors=knn,</span><br><span class="line">                algorithm=algo,</span><br><span class="line">                weights=weight) </span><br><span class="line">            score_poly1 = cross_validate_estimator(</span><br><span class="line">                est, <span class="keyword">None</span>,</span><br><span class="line">                X, y, n_split, </span><br><span class="line">                plot_learning_curves=<span class="keyword">False</span></span><br><span class="line">            )</span><br><span class="line">            score_poly2 = cross_validate_estimator(</span><br><span class="line">                est, <span class="keyword">None</span>,</span><br><span class="line">                X, y, n_split, </span><br><span class="line">                plot_learning_curves=<span class="keyword">False</span>,</span><br><span class="line">                polynomial=<span class="keyword">True</span>  <span class="comment"># Should not work, but testing anyways</span></span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">            scores.append([<span class="number">1</span>, knn, algo, weight, np.mean(score_poly1)])</span><br><span class="line">            scores.append([<span class="number">2</span>, knn, algo, weight, np.mean(score_poly2)])</span><br><span class="line">    </span><br><span class="line">scores = pd.DataFrame(columns=[<span class="string">"poly"</span>, <span class="string">"knn"</span>, <span class="string">"algo"</span>, <span class="string">"weight"</span>, <span class="string">"score"</span>], data=scores)</span><br></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scores.sort_values(by=<span class="string">"score"</span>, ascending=<span class="keyword">False</span>).head()</span><br></pre></td></tr></table></figure>
 <div>
@@ -837,16 +839,16 @@ From their learning curves, we suspected that they may suffer from <em>variance<
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
 </style>
-<table border="1" class="dataframe">
+<table border="0" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -901,27 +903,25 @@ From their learning curves, we suspected that they may suffer from <em>variance<
   </tbody>
 </table>
 </div>
-
-
-
 <p>The 3 best scores are obtained using a 5 nearest neighbour range, no polynomial feature (that was expected because of the high variance, but I still wanted to give it a try). And, the best weight function is also the default one (<code>uniform</code>). The best $F2$ score obtained is $\approx 0.79$.</p>
-<h5 id="SVM-with-rbf-kernel"><a href="#SVM-with-rbf-kernel" class="headerlink" title="SVM with rbf kernel"></a>SVM with rbf kernel</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line">warnings.filterwarnings(<span class="string">"ignore"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Decreasing the regularisation constant.</span></span><br><span class="line">scores = []     </span><br><span class="line">gammas=np.linspace(<span class="number">0.0001</span>, <span class="number">0.0009</span>, <span class="number">20</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> np.linspace(<span class="number">0.3</span>, <span class="number">1.5</span>, <span class="number">20</span>):</span><br><span class="line">    <span class="keyword">for</span> gamma <span class="keyword">in</span> gammas:</span><br><span class="line">        est = SVC(kernel=<span class="string">'rbf'</span>, C=c, gamma=gamma) </span><br><span class="line">        score = cross_validate_estimator(</span><br><span class="line">            est, </span><br><span class="line">            short_est_name,</span><br><span class="line">            X, y, n_split, </span><br><span class="line">            plot_learning_curves=<span class="keyword">False</span>,</span><br><span class="line">            polynomial=<span class="keyword">False</span></span><br><span class="line">        )</span><br><span class="line">        scores.append([gamma, c, np.mean(score), score])</span><br><span class="line">    </span><br><span class="line">scores = pd.DataFrame(columns=[<span class="string">"gamma"</span>, <span class="string">"C"</span>, <span class="string">"score"</span>, <span class="string">"detailed_score"</span>], data=scores)</span><br></pre></td></tr></table></figure>
+<h5>SVM with rbf kernel</h5>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> warnings</span><br><span class="line">warnings.filterwarnings(<span class="string">"ignore"</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># Decreasing the regularisation constant.</span></span><br><span class="line">scores = []     </span><br><span class="line">gammas=np.linspace(<span class="number">0.0001</span>, <span class="number">0.0009</span>, <span class="number">20</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> c <span class="keyword">in</span> np.linspace(<span class="number">0.3</span>, <span class="number">1.5</span>, <span class="number">20</span>):</span><br><span class="line">    <span class="keyword">for</span> gamma <span class="keyword">in</span> gammas:</span><br><span class="line">        est = SVC(kernel=<span class="string">'rbf'</span>, C=c, gamma=gamma) </span><br><span class="line">        score = cross_validate_estimator(</span><br><span class="line">            est, </span><br><span class="line">            short_est_name,</span><br><span class="line">            X, y, n_split, </span><br><span class="line">            plot_learning_curves=<span class="keyword">False</span>,</span><br><span class="line">            polynomial=<span class="keyword">False</span></span><br><span class="line">        )</span><br><span class="line">        scores.append([gamma, c, np.mean(score), score])</span><br><span class="line">    </span><br><span class="line">scores = pd.DataFrame(columns=[<span class="string">"gamma"</span>, <span class="string">"C"</span>, <span class="string">"score"</span>, <span class="string">"detailed_score"</span>], data=scores)</span><br></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scores.sort_values(by=<span class="string">"score"</span>, ascending=<span class="keyword">False</span>).head(<span class="number">3</span>)</span><br></pre></td></tr></table></figure>
 <div>
 <style scoped>
     .dataframe tbody tr th:only-of-type {
         vertical-align: middle;
     }
+<pre><code>.dataframe tbody tr th {
+    vertical-align: top;
+}
 
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
+.dataframe thead th {
+    text-align: right;
+}
+</code></pre>
 </style>
-<table border="1" class="dataframe">
+<table border="0" class="dataframe">
   <thead>
     <tr style="text-align: right;">
       <th></th>
@@ -937,41 +937,41 @@ From their learning curves, we suspected that they may suffer from <em>variance<
       <td>0.000858</td>
       <td>0.489474</td>
       <td>0.852015</td>
-      <td>[0.8807588075880759, 0.8666666666666666, 0.848…</td>
+      <td>[0.8807588075880759, 0.8666666666666666, 0.848...</td>
     </tr>
     <tr>
       <th>151</th>
       <td>0.000563</td>
       <td>0.742105</td>
       <td>0.852015</td>
-      <td>[0.8807588075880759, 0.8666666666666666, 0.848…</td>
+      <td>[0.8807588075880759, 0.8666666666666666, 0.848...</td>
     </tr>
     <tr>
       <th>286</th>
       <td>0.000353</td>
       <td>1.184211</td>
       <td>0.852015</td>
-      <td>[0.8807588075880759, 0.8666666666666666, 0.848…</td>
+      <td>[0.8807588075880759, 0.8666666666666666, 0.848...</td>
     </tr>
   </tbody>
 </table>
 </div>
-
-
-
-<p>Bests score for this model seems to plateau at about $F_2 \approx 0.85$. 
+<p>Bests score for this model seems to plateau at about $F_2 \approx 0.85$.
 Let’s take $\gamma=8.6 \times 10^{-4}$ and $C= 0.5$.</p>
-<h4 id="Summary-for-those-3-models"><a href="#Summary-for-those-3-models" class="headerlink" title="Summary for those 3 models"></a>Summary for those 3 models</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">estimators = [</span><br><span class="line">    SVC(kernel=<span class="string">'rbf'</span>, C=<span class="number">0.5</span>, gamma=<span class="number">0.00086</span>),</span><br><span class="line">    KNeighborsClassifier(n_neighbors=<span class="number">5</span>, algorithm=<span class="string">'brute'</span>, weights=<span class="string">'uniform'</span>),</span><br><span class="line">    LogisticRegression(solver=<span class="string">'lbfgs'</span>, C=<span class="number">0.002</span>)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">final_scores = pd.DataFrame()</span><br><span class="line"><span class="keyword">for</span> est <span class="keyword">in</span> estimators:</span><br><span class="line">    short_est_name = get_short_classifiers_name(str(est))</span><br><span class="line">    <span class="keyword">if</span> short_est_name.startswith(<span class="string">'Logistic'</span>):</span><br><span class="line">        final_scores[short_est_name] = cross_validate_estimator(</span><br><span class="line">            est, short_est_name,</span><br><span class="line">            X, y, n_split,</span><br><span class="line">            plot_learning_curves=<span class="keyword">True</span>,</span><br><span class="line">            polynomial=<span class="keyword">True</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        final_scores[short_est_name] = cross_validate_estimator(</span><br><span class="line">            est, short_est_name,</span><br><span class="line">            X, y, n_split,</span><br><span class="line">            plot_learning_curves=<span class="keyword">True</span>,</span><br><span class="line">            polynomial=<span class="keyword">False</span>)</span><br></pre></td></tr></table></figure>
-<img src="/2018/12/05/PlayingWithMammo/output_45_0.png">
-<img src="/2018/12/05/PlayingWithMammo/output_45_1.png">
-<img src="/2018/12/05/PlayingWithMammo/output_45_2.png">
+<h4>Summary for those 3 models</h4>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">estimators = [</span><br><span class="line">    SVC(kernel=<span class="string">'rbf'</span>, C=<span class="number">0.5</span>, gamma=<span class="number">0.00086</span>),</span><br><span class="line">    KNeighborsClassifier(n_neighbors=<span class="number">5</span>, algorithm=<span class="string">'brute'</span>, weights=<span class="string">'uniform'</span>),</span><br><span class="line">    LogisticRegression(solver=<span class="string">'lbfgs'</span>, C=<span class="number">0.002</span>)</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">final_scores = pd.DataFrame()</span><br><span class="line"><span class="keyword">for</span> est <span class="keyword">in</span> estimators:</span><br><span class="line">    short_est_name = get_short_classifiers_name(str(est))</span><br><span class="line">    <span class="keyword">if</span> short_est_name.startswith(<span class="string">'Logistic'</span>):</span><br><span class="line">        final_scores[short_est_name] = cross_validate_estimator(</span><br><span class="line">            est, short_est_name,</span><br><span class="line">            X, y, n_split,</span><br><span class="line">            plot_learning_curves=<span class="keyword">True</span>,</span><br><span class="line">            polynomial=<span class="keyword">True</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        final_scores[short_est_name] = cross_validate_estimator(</span><br><span class="line">            est, short_est_name,</span><br><span class="line">            X, y, n_split,</span><br><span class="line">            plot_learning_curves=<span class="keyword">True</span>,</span><br><span class="line">            polynomial=<span class="keyword">False</span>)</span><br></pre></td></tr></table></figure>
+<img src="/2018/12/09/PlayingWithMammo/output_45_0.png">
+<img src="/2018/12/09/PlayingWithMammo/output_45_1.png">
+<img src="/2018/12/09/PlayingWithMammo/output_45_2.png">
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">plot_classif_scores(final_scores)</span><br></pre></td></tr></table></figure>
 <pre><code>KNeighborsClassifier()         0.794383
 LogisticRegression(C=0.002)    0.837863
-SVC(C=0.5, kernel=&apos;rb)         0.851618
+SVC(C=0.5, kernel='rb)         0.851618
 dtype: float64
-</code></pre><img src="/2018/12/05/PlayingWithMammo/output_46_1.png">
-<h2 id="3-Final-result"><a href="#3-Final-result" class="headerlink" title="3 - Final result"></a>3 - Final result</h2><p>So far, our winner is the <code>SVC(kernel=&#39;rbf&#39;, C=0.5, gamma=0.00086)</code> model.
+</code></pre>
+<img src="/2018/12/09/PlayingWithMammo/output_46_1.png">
+<h2>3 - Final result</h2>
+<p>So far, our winner is the <code>SVC(kernel='rbf', C=0.5, gamma=0.00086)</code> model.
 Yay.</p>
 </section>
     <!-- Tags START -->
@@ -995,13 +995,13 @@ Yay.</p>
   <div class="nav-container">
     <!-- reverse left and right to put prev and next in a more logic postition -->
     
-    
-      <a class="nav-right" href="/2018/12/05/typematrix/">
+      <a class="nav-left" href="/2018/12/09/LeMot/">
+        <span class="nav-arrow">← </span>
         
-          Passer Au Bépo TypeMatrix Sous Linux (Ubuntu)
+          Non, Un Token N&#39;est Pas Un mot...
         
-        <span class="nav-arrow"> →</span>
       </a>
+    
     
   </div>
 
@@ -1023,7 +1023,7 @@ Yay.</p>
   <div class="toc-main">
     <strong class="toc-title">Catalog</strong>
     
-      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#1-Loading-and-cleaning-the-data"><span class="toc-nav-text">1 - Loading and cleaning the data</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Dealing-with-missing-values"><span class="toc-nav-text">Dealing with missing values</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Dealing-with-outliers"><span class="toc-nav-text">Dealing with outliers</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Are-our-features-correlated"><span class="toc-nav-text">Are our features correlated ?</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#2-Comparing-toy-models-on-this-dataset"><span class="toc-nav-text">2 - Comparing toy models on this dataset</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Baselines"><span class="toc-nav-text">Baselines</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#What-are-the-learning-curves-telling-us"><span class="toc-nav-text">What are the learning curves telling us ?</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#What-are-the-estimated-scores-for-each-model"><span class="toc-nav-text">What are the estimated scores for each model ?</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Improving-the-3-best-models"><span class="toc-nav-text">Improving the 3-best models</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#Logistic-regression"><span class="toc-nav-text">Logistic regression</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#KNN"><span class="toc-nav-text">KNN</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#SVM-with-rbf-kernel"><span class="toc-nav-text">SVM with rbf kernel</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#Summary-for-those-3-models"><span class="toc-nav-text">Summary for those 3 models</span></a></li></ol><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#3-Final-result"><span class="toc-nav-text">3 - Final result</span></a></li>
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">1 - Loading and cleaning the data</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Dealing with missing values</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Dealing with outliers</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Are our features correlated ?</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">2 - Comparing toy models on this dataset</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Baselines</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Visualisation</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">$F_2$-Scores estimation and learning curves</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">What are the learning curves telling us ?</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">What are the estimated scores for each model ?</span></a></li></ol></li></ol></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Improving the 3-best models</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Logistic regression</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">KNN</span></a></li><li class="toc-nav-item toc-nav-level-5"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">SVM with rbf kernel</span></a></li></ol></li><li class="toc-nav-item toc-nav-level-4"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Summary for those 3 models</span></a></li></ol><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">3 - Final result</span></a></li>
     
   </div>
 </aside>
@@ -1033,7 +1033,7 @@ Yay.</p>
 
 <script>
   (function () {
-    var url = 'https://valerie-hanoka.github.io/2018/12/05/PlayingWithMammo/';
+    var url = 'https://valerie-hanoka.github.io/2018/12/09/PlayingWithMammo/';
     var banner = ''
     if (banner !== '' && banner !== 'undefined' && banner !== 'null') {
       $('#article-banner').css({
@@ -1117,7 +1117,7 @@ Yay.</p>
 <script>
   var disqus_shortname = '';
   
-  var disqus_url = 'https://valerie-hanoka.github.io/2018/12/05/PlayingWithMammo/';
+  var disqus_url = 'https://valerie-hanoka.github.io/2018/12/09/PlayingWithMammo/';
   
   (function(){
     var dsq = document.createElement('script');

@@ -150,20 +150,22 @@
     <section class="markdown-content"><p><em>Vous avez décidé de sauter le pas afin de soulager vos poignets: vous passez au bépo.
 Pour ne pas faire les choses à moitié, vous avez même investi dans un nouveau clavier ergonomique.
 Félicitations !</em></p>
-<p> <em>C’est le moment d’installer le clavier</em>
-<a id="more"></a></p>
+<p><em>C’est le moment d’installer le clavier</em></p>
+<a id="more"></a>
 <blockquote>
 <p><span style="color:red">⚠ Ne réalisez ces opérations que lorsque vous êtes sûrs de pouvoir passer définitivement en mode bépo; par exemple, assurez vous de pouvoir taper tous vos mots de passe sans difficulté avec le nouveau clavier.</span></p>
 </blockquote>
 <hr>
-<h2 id="Configurez-l’agencement-du-clavier"><a href="#Configurez-l’agencement-du-clavier" class="headerlink" title="Configurez l’agencement du clavier"></a>Configurez l’agencement du clavier</h2><ul>
+<h2>Configurez l’agencement du clavier</h2>
+<ul>
 <li>Ouvrez un terminal et lancez la commande <code>sudo dpkg-reconfigure keyboard-configuration</code></li>
 <li>Selon votre type de clavier, sélectionnez un des TypeMatrix (ou la marque correspondant à votre clavier). Pour ma part, j’ai sélectionné « <code>TypeMatrix EZ-Reach 2030 USB</code> », qui était abrégé « `TMx2030USB » sur l’emballage du clavier.</li>
 <li>Pour les autres questions, à moins de connaître la réponse, appuyez sur entrée: cela conserve la réponse par défaut.</li>
 </ul>
-<h2 id="Passez-en-mode-de-saisie-bepo"><a href="#Passez-en-mode-de-saisie-bepo" class="headerlink" title="Passez en mode de saisie bépo"></a>Passez en mode de saisie bépo</h2><ul>
+<h2>Passez en mode de saisie bépo</h2>
+<ul>
 <li>Ouvrez les paramètres de saisie de texte (sans doute une petite icône <code>[FR]</code> en haut à gauche)</li>
-<li>En dessous de « sources d’entrée à utiliser », si « Français (Bépo, ergonomique, façon Dvorak) » 
+<li>En dessous de « sources d’entrée à utiliser », si « Français (Bépo, ergonomique, façon Dvorak) »
 n’apparaît pas dans la liste, il faut le rajouter. Vous pouvez l’ajouter avec l’icône en forme de petite croix en bas de l’encart.</li>
 </ul>
 <p>Pour vérifier que vous avez la configuration qui correspond effectivement à votre clavier, il y a une dernière étape:</p>
@@ -172,9 +174,11 @@ n’apparaît pas dans la liste, il faut le rajouter. Vous pouvez l’ajouter av
 <li>Si ce n’est pas la même, il vous faudra relancer la commande <code>dpkg-reconfigure keyboard-configuration</code> et sélectionner un autre clavier.</li>
 </ul>
 <p>Vous pouvez à présent ouvrir un éditeur de texte et commencer à taper (en pensant bien à désactiver le pavé numérique).</p>
-<h2 id="Optionnel-—-Desactiver-votre-clavier-natif-sous-Linux-Ubuntu"><a href="#Optionnel-—-Desactiver-votre-clavier-natif-sous-Linux-Ubuntu" class="headerlink" title="Optionnel — Désactiver votre clavier natif sous Linux (Ubuntu)"></a>Optionnel — Désactiver votre clavier natif sous Linux (Ubuntu)</h2><p>Si vous branchez votre nouveau clavier USB sur votre ordinateur portable, vous voudrez peut être désactiver le clavier built-in.
- Dans ce cas, vous pouvez le faire en tapant les commandes suivantes, selon si vous désirez désactiver votre clavier temporairement ou définitivement.</p>
-<h3 id="Desactivation-temporaire"><a href="#Desactivation-temporaire" class="headerlink" title="Désactivation temporaire"></a>Désactivation temporaire</h3><p>(extrait traduit de <a href="https://askubuntu.com/questions/160945/is-there-a-way-to-disable-a-laptops-internal-keyboard" target="_blank" rel="noopener">ceci</a>):</p>
+<h2>Optionnel — Désactiver votre clavier natif sous Linux (Ubuntu)</h2>
+<p>Si vous branchez votre nouveau clavier USB sur votre ordinateur portable, vous voudrez peut être désactiver le clavier built-in.
+Dans ce cas, vous pouvez le faire en tapant les commandes suivantes, selon si vous désirez désactiver votre clavier temporairement ou définitivement.</p>
+<h3>Désactivation temporaire</h3>
+<p>(extrait traduit de <a href="https://askubuntu.com/questions/160945/is-there-a-way-to-disable-a-laptops-internal-keyboard" target="_blank" rel="noopener">ceci</a>):</p>
 <ul>
 <li>Lancez la commande <code>xinput list</code>. Cette commande liste les périphériques d’entrées (souris, clavier, touchpad…).</li>
 <li>Dans la liste, vous devriez voir apparaître « AT Translated Set 2 keyboard ». Il s’agit de votre clavier d’ordinateur portable, celui que vous souhaitez désactiver. Relevez son numéro d’<strong>id</strong> et aussi le numéro du « <strong>master</strong> », qui se trouve à cet emplacement: <code>[slave keyboard (#master)]</code></li>
@@ -182,19 +186,21 @@ n’apparaît pas dans la liste, il faut le rajouter. Vous pouvez l’ajouter av
 Il est également possible de le désactiver avec la commande <code>xinput disable &quot;AT Translated Set 2 keyboard&quot;</code> directement.</li>
 </ul>
 <p>Pour réactiver ce clavier là, il faudra lancer la commande <code>xinput reattach &lt;#id&gt; &lt;#master&gt;</code>.</p>
-<h3 id="Desactivation-«-definitive-»"><a href="#Desactivation-«-definitive-»" class="headerlink" title="Désactivation « définitive »"></a>Désactivation « définitive »</h3><ul>
+<h3>Désactivation « définitive »</h3>
+<ul>
 <li>Éditez (en mode super utilisateur) le fichier <code>/etc/default/grub</code>.</li>
 <li>Trouvez la ligne <code>GRUB_CMDLINE_LINUX_DEFAULT=&quot;quiet splash&quot;</code> et la remplacer par <code>GRUB_CMDLINE_LINUX_DEFAULT=&quot;quiet splash i8042.nokbd&quot;</code>. Sauvegardez.</li>
 <li>Mettez votre GRUB à jour avec la commande <code>sudo update-grub</code> et redémarrez votre ordinateur.</li>
 </ul>
-<h1 id="Conseils-generiques-pour-une-transition-au-bepo"><a href="#Conseils-generiques-pour-une-transition-au-bepo" class="headerlink" title="Conseils génériques pour une transition au bépo"></a>Conseils génériques pour une transition au bépo</h1><p> Les principaux conseils pour réussir votre transition vers une nouvelle disposition de touche tiennent en 2 lignes:</p>
+<h1>Conseils génériques pour une transition au bépo</h1>
+<p>Les principaux conseils pour réussir votre transition vers une nouvelle disposition de touche tiennent en 2 lignes:</p>
 <ul>
-<li><a href="https://bepo.fr/wiki/Apprentissage" target="_blank" rel="noopener">Ne pas regarder son clavier lors de l’apprentissage</a>. 
+<li><a href="https://bepo.fr/wiki/Apprentissage" target="_blank" rel="noopener">Ne pas regarder son clavier lors de l’apprentissage</a>.
 Vous pouvez par exemple vous entraîner plusieurs heures par jour sur <a href="http://tazzon.free.fr/dactylotest/bepodactyl/" target="_blank" rel="noopener">Bépodactyl</a>.</li>
 <li>Ne pas revenir en arrière (malgré les tentations). Dès lors que vous passez une de vos machine en Bépo, tenez-vous y. Perso j’ai pas encore réussi.</li>
 </ul>
 <hr>
-<p> <em>Billet rédigé en 2 heures pour la première prise en main de mon nouveau TypeMatrix.</em></p>
+<p><em>Billet rédigé en 2 heures pour la première prise en main de mon nouveau TypeMatrix.</em></p>
 </section>
     <!-- Tags START -->
     
@@ -204,13 +210,13 @@ Vous pouvez par exemple vous entraîner plusieurs heures par jour sur <a href="h
   <div class="nav-container">
     <!-- reverse left and right to put prev and next in a more logic postition -->
     
-      <a class="nav-left" href="/2018/12/05/PlayingWithMammo/">
-        <span class="nav-arrow">← </span>
-        
-          Playing With Mammographic Masses !
-        
-      </a>
     
+      <a class="nav-right" href="/2018/12/09/LeMot/">
+        
+          Non, Un Token N&#39;est Pas Un mot...
+        
+        <span class="nav-arrow"> →</span>
+      </a>
     
   </div>
 
@@ -232,7 +238,7 @@ Vous pouvez par exemple vous entraîner plusieurs heures par jour sur <a href="h
   <div class="toc-main">
     <strong class="toc-title">Catalog</strong>
     
-      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Configurez-l’agencement-du-clavier"><span class="toc-nav-text">Configurez l’agencement du clavier</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Passez-en-mode-de-saisie-bepo"><span class="toc-nav-text">Passez en mode de saisie bépo</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#Optionnel-—-Desactiver-votre-clavier-natif-sous-Linux-Ubuntu"><span class="toc-nav-text">Optionnel — Désactiver votre clavier natif sous Linux (Ubuntu)</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Desactivation-temporaire"><span class="toc-nav-text">Désactivation temporaire</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#Desactivation-«-definitive-»"><span class="toc-nav-text">Désactivation « définitive »</span></a></li></ol></li></ol><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#Conseils-generiques-pour-une-transition-au-bepo"><span class="toc-nav-text">Conseils génériques pour une transition au bépo</span></a>
+      <ol class="toc-nav"><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Configurez l’agencement du clavier</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Passez en mode de saisie bépo</span></a></li><li class="toc-nav-item toc-nav-level-2"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Optionnel — Désactiver votre clavier natif sous Linux (Ubuntu)</span></a><ol class="toc-nav-child"><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Désactivation temporaire</span></a></li><li class="toc-nav-item toc-nav-level-3"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Désactivation « définitive »</span></a></li></ol></li></ol><li class="toc-nav-item toc-nav-level-1"><a class="toc-nav-link" href="#undefined"><span class="toc-nav-text">Conseils génériques pour une transition au bépo</span></a>
     
   </li></div>
 </aside>
